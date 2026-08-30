@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Geometría de tu Nombre</title>
+<style>
+  :root{
+    --paper:#F7F2E9; --paper-dark:#EDE5D6; --ink:#2B2115;
+    --gold:#A8863D; --gold-text:#4a3410; --blue:#3A4A5C; --soft:#4A3B2C;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
+    font-family:"Avenir Next","Futura","Optima","Helvetica Neue",sans-serif;
+    -webkit-tap-highlight-color:transparent;}
+  .serif{font-family:Georgia,serif}
+  .wrap{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;
+    padding:3.2rem 1.5rem 3rem;display:flex;flex-direction:column;}
+  .brand{text-align:center;font-size:.62rem;letter-spacing:.35em;text-transform:uppercase;
+    color:var(--blue);margin-bottom:2rem;}
+  .dots{display:flex;justify-content:center;gap:.5rem;margin-bottom:2rem;}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.25;}
+  .dot.on{opacity:.9}
+  .step{flex:1;display:flex;flex-direction:column;justify-content:center;gap:1.5rem;
+    animation:fadeUp .5s ease-out both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  h1{font-family:Georgia,serif;font-size:1.9rem;line-height:1.3;margin:0;}
+  h1.big{font-size:2.3rem;color:var(--gold-text);text-align:center}
+  h2{font-family:Georgia,serif;font-size:1.25rem;margin:0;}
+  p{font-size:1.05rem;line-height:1.65;margin:0;}
+  p.small{font-size:.95rem;color:var(--soft)}
+  .frase{font-family:Georgia,serif;font-style:italic;font-size:1.1rem;color:var(--gold-text);margin:0;}
+  .center{text-align:center}
+  .maxw{max-width:420px;margin:0 auto;}
+  label.field{display:flex;flex-direction:column;gap:.25rem;font-size:.85rem;color:var(--soft);}
+  input[type=text],input[type=email],textarea{
+    width:100%;border:0;border-bottom:2px solid rgba(74,59,44,.4);background:transparent;
+    padding:.6rem .1rem;font-family:inherit;font-size:1rem;color:var(--ink);outline:none;
+  }
+  input[type=text]:focus,input[type=email]:focus,textarea:focus{border-bottom-color:var(--gold)}
+  textarea{border:1px solid rgba(74,59,44,.3);border-radius:6px;padding:.75rem;min-height:80px;resize:vertical;}
+  .btn{border:2px solid var(--gold);background:transparent;color:var(--gold-text);
+    padding:.85rem 1.8rem;border-radius:8px;font-family:inherit;font-size:.85rem;font-weight:600;
+    text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:.15s;}
+  .btn:hover{background:var(--gold);color:var(--paper)}
+  .btn:disabled{border-color:rgba(74,59,44,.3);color:rgba(74,59,44,.4);cursor:default;}
+  .btn:disabled:hover{background:transparent;color:rgba(74,59,44,.4)}
+  .btn.center-self{align-self:center;margin-top:.5rem}
+  .opciones{display:flex;flex-direction:column;gap:.5rem;}
+  .op{border:1px solid transparent;background:var(--paper-dark);color:var(--ink);
+    text-align:left;padding:.8rem 1rem;border-radius:6px;font-family:inherit;font-size:.95rem;cursor:pointer;}
+  .op:hover{border-color:rgba(168,134,61,.5)}
+  .op.sel{border-color:var(--gold);color:var(--gold-text);}
+  .checkbox-row{display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;font-style:italic;color:var(--soft)}
+  .err{color:#7a1f1f;font-size:.9rem}
+  .mic-wrap{display:flex;align-items:center;gap:.75rem;}
+  .mic-btn{display:flex;align-items:center;gap:.5rem;border:1px solid rgba(74,59,44,.4);
+    background:transparent;color:var(--soft);padding:.55rem 1rem;border-radius:6px;
+    font-family:inherit;font-size:.9rem;cursor:pointer;}
+  .mic-btn:hover{border-color:var(--gold);color:var(--gold-text)}
+  .mic-btn.rec{border-color:var(--gold);background:var(--paper-dark);color:var(--gold-text);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+  .mic-note{border:1px solid rgba(74,59,44,.3);background:var(--paper-dark);border-radius:6px;
+    padding:.8rem 1rem;font-size:.85rem;color:var(--soft)}
+  .perfil-box{border:1px solid rgba(168,134,61,.4);background:var(--paper-dark);border-radius:8px;padding:1.3rem;}
+  .perfil-box h3{font-family:Georgia,serif;font-size:1.4rem;color:var(--gold-text);margin:0 0 .7rem;}
+  hr{border:0;border-top:1px solid var(--paper-dark);margin:.5rem 0;}
+  audio{height:32px}
+  .resumen{white-space:pre-wrap;font-size:.85rem;background:var(--paper-dark);border-radius:6px;
+    padding:1rem;border:1px solid rgba(74,59,44,.25);max-height:40vh;overflow:auto;}
+  .copybar{display:flex;gap:.6rem;flex-wrap:wrap}
+  .link{background:none;border:none;color:var(--soft);text-decoration:underline;font-size:.8rem;cursor:pointer;font-family:inherit;padding:0;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* =========================================================================
+   La Geometría de tu Nombre — invitación compartible, autocontenida.
+   Texto y flujo: fuente única carriles/guion-invitacion-v3.md, tal como vive
+   en ns01-app/components/invitacion/InvitacionFlow.tsx +
+   ns01-app/lib/invitacion/{contenido.ts,matriz.ts}. No parafrasear aquí: si
+   el texto cambia, cambia primero en el guion y se copia a los tres lugares.
+   Guarda todo en localStorage (clave realme_inv_v3). Nada viaja a servidor.
+   ========================================================================= */
+
+// ---------- Contenido (copiado literal de lib/invitacion/contenido.ts) ----------
+
+const PREGUNTAS = [
+  {
+    id:"q1",
+    antes:"Yo existía mucho antes de que tú nacieras. Pero hubo un momento exacto en que alguien tomó una decisión. Alguien eligió que yo sería la palabra con la que comenzarían a reconocerte.",
+    pregunta:"¿Quién me eligió para ti?", multi:false, permiteTexto:true, permiteVoz:true,
+    opciones:[
+      {id:"mama",label:"Mi mamá"},{id:"papa",label:"Mi papá"},{id:"ambos",label:"Los dos, juntos"},
+      {id:"abuelo",label:"Mi abuela o abuelo"},{id:"otroFamiliar",label:"Una tía, tío u otra persona de la familia"},
+      {id:"fueraFamilia",label:"Alguien fuera de la familia"},{id:"registroDistinto",label:"El registro civil lo escribió distinto o lo cambió"},
+      {id:"noSe",label:"No lo sé — nunca lo pregunté"},
+    ],
+  },
+  {
+    id:"q2",
+    antes:"__DESPUES_Q1__ Pero elegir un nombre casi nunca es solo elegir una palabra. Detrás suele existir una persona, un recuerdo, un deseo… o una razón que nunca llegó a contarse.",
+    pregunta:"¿Sabes por qué me eligieron para ti?", multi:false, permiteTexto:true, permiteVoz:true,
+    opciones:[
+      {id:"yaLoLlevaba",label:"Alguien de la familia ya lo llevaba"},{id:"fe",label:"Por la fe: un santo, la biblia, una promesa"},
+      {id:"personajeCancion",label:"Por un personaje, una canción, una época"},{id:"sonido",label:"Simplemente les gustó cómo sonaba"},
+      {id:"creado",label:"Lo inventaron o combinaron especialmente para mí"},{id:"historia",label:"Hay una historia que me han contado"},
+      {id:"noSe",label:"No lo sé"},
+    ],
+  },
+  {
+    id:"q3",
+    antes:"Esa fue la historia de cómo llegué a ti. Pero recibir un nombre y vivir dentro de él no son la misma cosa.",
+    pregunta:"¿Cómo me llaman las personas que forman parte de tu vida?", multi:true, permiteTexto:true, permiteVoz:true,
+    textoEsPrincipal:true, placeholderTexto:"Los apodos, tal cual los usan (pueden ser varios)",
+    opciones:[
+      {id:"tal cual",label:"Me dicen mi nombre tal cual"},{id:"versionCorta",label:"Una versión corta"},
+      {id:"apodoAjeno",label:"Un apodo que no viene de mi nombre"},{id:"cadaQuienDistinto",label:"Cada quien me dice distinto"},
+      {id:"otroIdioma",label:"En casa suena en otro idioma o con otro acento"},
+    ],
+  },
+  {
+    id:"q4",
+    antes:"__DESPUES_Q3__\n\nHe estado contigo en cada presentación, cada firma, cada vez que alguien quiso llamarte. A veces fui orgullo. A veces costumbre. Tal vez, en algún momento, también fui distancia.",
+    fraseClave:"Una cosa es el nombre que recibiste. Otra, el nombre que hiciste tuyo.",
+    pregunta:"¿Cómo te has sentido al llevarme?", multi:false, permiteTexto:true, permiteVoz:true,
+    opciones:[
+      {id:"orgullo",label:"Orgullo"},{id:"carino",label:"Cariño"},{id:"costumbre",label:"Costumbre — ni lo pienso"},
+      {id:"incomodidad",label:"A veces, incomodidad"},{id:"costoAceptar",label:"Me costó aceptarlo"},
+      {id:"cambioAnos",label:"Ha cambiado con los años"},{id:"nuncaPregunte",label:"Nunca me lo había preguntado"},
+    ],
+  },
+  {
+    id:"q5",
+    antes:"Eso que sentiste también forma parte de mi historia. Porque un nombre no solo se recibe: también se acepta, se cuestiona, se transforma o se aprende a habitar.",
+    pregunta:"¿Hubo algún momento en que deseaste llamarte de otra manera?", multi:false, permiteTexto:true, permiteVoz:true,
+    opciones:[
+      {id:"nino",label:"Sí, cuando era niña o niño"},{id:"adulto",label:"Sí, ya de adulto"},
+      {id:"segunLugar",label:"Solo en ciertos lugares o con cierta gente"},{id:"parcial",label:"Quise cambiar solo una parte (un nombre o un apellido)"},
+      {id:"nunca",label:"Nunca"},{id:"nuncaPensado",label:"Nunca lo había pensado"},
+    ],
+    campoCondicional:{activaSi:["nino","adulto","segunLugar","parcial"],placeholder:"¿Qué nombre querías? (opcional)"},
+  },
+  {
+    id:"q6",
+    antes:"__DESPUES_Q5__\n\nNo soy solo la forma en que me escriben. También soy el sonido que hace que gires la cabeza cuando alguien te llama. Y no todas las personas me pronuncian como tú me reconoces.",
+    fraseClave:"No siempre rechazamos nuestro nombre. A veces rechazamos lo que aprendimos a sentir cuando lo escuchábamos.",
+    pregunta:"¿Cómo debo sonar cuando alguien dice tu nombre?", multi:true, permiteTexto:true, permiteVoz:true,
+    textoEsPrincipal:true, placeholderTexto:"Dilo tú, como debe sonar (o escríbelo)",
+    opciones:[
+      {id:"igualEscrito",label:"Suena igual que como se escribe"},{id:"cambiaSegunQuien",label:"Cambia según quién lo diga"},
+      {id:"familiaDistinto",label:"En mi familia suena distinto que afuera"},{id:"otroIdioma",label:"Trae un sonido de otro idioma"},
+    ],
+  },
+  {
+    id:"q7",
+    antes:"Esa es mi forma más cercana a ti. La que reconoces sin verla escrita. La que lleva tu historia, tu acento y la manera en que aprendiste a responderme.",
+    pregunta:"¿Alguna vez han cambiado, acortado o pronunciado mal tu nombre? ¿Qué hiciste tú con eso?", multi:false, permiteTexto:true, permiteVoz:true,
+    opciones:[
+      {id:"corrijoSiempre",label:"Lo corrijo siempre"},{id:"corrijoAVeces",label:"Lo corrijo solo a veces, según quién"},
+      {id:"dejoPasar",label:"Lo dejo pasar"},{id:"adapteVersion",label:"Me adapté: uso otra versión según el lugar"},
+      {id:"molestaCallo",label:"Me molesta, pero no digo nada"},{id:"daIgual",label:"Me da igual"},{id:"casiNunca",label:"Casi nunca pasa"},
+    ],
+  },
+  {
+    id:"q8",
+    antes:"__DESPUES_Q7__\n\nHe cambiado contigo. No soy exactamente el mismo nombre que recibiste al nacer. Ahora llevo lo que viviste, lo que elegiste conservar y también lo que decidiste transformar.",
+    fraseClave:"La manera en que permites que digan tu nombre también revela cómo ocupas tu lugar.",
+    pregunta:"¿Qué lugar ocupo hoy en tu vida?", multi:false, permiteTexto:true, permiteVoz:true,
+    opciones:[
+      {id:"identidad",label:"Eres parte de mi identidad — me representas"},{id:"masCarino",label:"Te quiero más que antes"},
+      {id:"funcional",label:"Eres mi nombre y ya — funcional"},{id:"haciendoPaces",label:"Todavía estamos haciendo las paces"},
+      {id:"vinculo",label:"Eres mi vínculo con mi familia y mi historia"},{id:"nuncaPensado",label:"Nunca lo había pensado, hasta hoy"},
+    ],
+  },
+  {
+    id:"q9",
+    antes:"Eso es lo que soy hoy para ti. No solo una palabra en un documento. Soy la forma en que te presentas, la manera en que otros te reconocen y una parte de la historia que has construido contigo.",
+    pregunta:"¿Qué descubriste sobre ti al hablar de mí de esta manera?", multi:false, permiteTexto:true, permiteVoz:true,
+    notaSuave:"No hay respuesta corta que valga más que la tuya.",
+  },
+];
+
+const EMBED_Q1 = {mama:"tu mamá",papa:"tu papá",ambos:"los dos, juntos",abuelo:"tu abuela o tu abuelo",
+  otroFamiliar:"alguien más de tu familia",fueraFamilia:"alguien fuera de tu familia",
+  registroDistinto:"el registro civil, a su manera",noSe:"alguien que hoy todavía no logras identificar"};
+const EMBED_Q3 = {"tal cual":"",versionCorta:"una versión más corta de tu nombre",apodoAjeno:"un apodo que no viene de tu nombre",
+  cadaQuienDistinto:"distintas formas, según quién te llame",otroIdioma:"un sonido distinto, con el acento de casa"};
+
+function despuesQ1(r){return `Entonces fue ${r} quien me puso en tu camino.`}
+function despuesQ3(nr,nv){return `Así fui cambiando contigo. En los documentos puedo aparecer como ${nr}, pero en tu vida también existo como ${nv}.`}
+const DESPUES_Q5 = "Quizá no querías dejarme atrás. Quizá solo necesitabas encontrar una forma de reconocerme como tuyo.";
+const DESPUES_Q7 = "Cada vez que me corregiste, me adaptaste o decidiste dejarme sonar distinto, también estabas tomando una decisión sobre ti.";
+
+const ENTRADA = {
+  titulo:"No conoces tu nombre tanto como crees.",
+  cuerpo:"Descubre cómo llegó hasta ti, cómo lo transformaste al hacerlo tuyo y qué parte de su historia todavía desconoces.",
+  boton:"Quiero ser de los primeros en vivirlo",
+};
+const REGISTRO = {
+  intro:"Estás a punto de registrar tu nombre en La geometría de tu nombre, la primera experiencia de Realm-e.",
+  labelNombre:"¿Cómo te llamas?",
+  avisoCorreo:"Cuando tu acceso a la primera edición esté listo, te avisaremos por correo.",
+  labelCorreo:"¿A qué correo te avisamos?",
+  boton:"Guardar mi lugar y continuar",
+  confirmacion:"Tu lugar está reservado. Para llegar a los orígenes ocultos de tu nombre, necesitamos el único dato que no está en los registros históricos: cómo lo has vivido tú. Lo que compartas aquí será la brújula de nuestra investigación.",
+  pie:"Tu correo se guarda solo para avisarte cuando tu acceso esté listo. Tus respuestas, tu voz y tus historias se quedan solo en este dispositivo.",
+};
+const ANTES_PERFIL = {
+  antes:"Ahora ya conoces la parte de mi historia que solo tú podías contar. Sabes cómo llegué a ti, cómo me llamas, cómo me hiciste tuyo, cómo debo sonar y qué lugar ocupo en tu vida.",
+  fraseClave:"Antes de investigar de dónde vengo, necesitábamos descubrir quién llegué a ser contigo.",
+  gancho:"Tu parte ya está registrada. Ahora Realm-e podrá comenzar, cuando llegue tu turno, a buscar la parte de mi historia que ocurrió antes de ti.",
+  manifiestoIntro:"No soy solo una palabra. Existo en la tinta de tus documentos, pero cobré vida en tus decisiones, en tu voz y en tus relaciones. Por lo que acabas de contarme, esta es la forma en que hoy parecemos vivir juntos:",
+  cierre:"Esta es la parte de mí que tú sí conoces. Pero todavía existe una parte que ninguno de los dos puede recordar.",
+};
+const PERFILES = {
+  esculpido:{titulo:"Fui esculpido",texto:"No te quedaste únicamente con la versión que apareció en tus documentos. Tú o las personas que te quieren fueron ajustándome hasta encontrar una forma más cercana, práctica o íntima de llamarte. No permitiste que el papel tuviera la última palabra. No me rechazaste: me transformaste hasta reconocerme como tuyo."},
+  conquistado:{titulo:"Fui conquistado",texto:"No fui un regalo fácil de recibir. Tuviste que aprender a defenderme, corregirme o seguir haciendo las paces conmigo. En ese proceso descubriste que ocupar tu lugar también significa no reducirte para facilitarles las cosas a otros. Hoy, pedir que me digan correctamente es una forma de hacerte presente."},
+  "raiz-viva":{titulo:"Soy tu raíz viva",texto:"Me llevas contigo porque reconoces el peso de la historia que me entregó a ti. Eres la continuidad de una decisión tomada antes de que nacieras. Para ti no soy un límite, sino un ancla. Te recuerdo que no comenzaste desde cero: perteneces a una historia que vuelve a hacerse presente cada vez que alguien me pronuncia."},
+  frontera:{titulo:"Soy tu frontera",texto:"Aprendiste a dejarme vivir de maneras diferentes según el lugar y las personas. A los desconocidos les entregas mi versión oficial o práctica. Pero reservas mi forma más íntima —con su propio sonido, acento o historia— para quienes conocen una parte más cercana de ti. No todas mis versiones abren la misma puerta."},
+  ligereza:{titulo:"Vivo contigo con ligereza",texto:"Sabes que eres mucho más grande que las letras que me forman. No necesitas que yo esconda un significado extraordinario para reconocer tu valor. Tu identidad también se construye en lo que eliges y haces. Yo te acompaño, pero no necesito explicarte por completo."},
+  creado:{titulo:"Fui creado para ti",texto:"Según la historia que conoces, fui creado, combinado o modificado especialmente para ti. No llegué a tu vida exactamente como otros nombres: alguien intervino en mi forma antes de entregártela. Tal vez mi historia tenga antecedentes que todavía desconocemos, pero en tu familia tú representas un nuevo comienzo."},
+};
+const BAJA_CERTEZA = {titulo:"Tu relación todavía está tomando forma",texto:"Hay partes de tu relación con tu nombre que aparecieron hoy por primera vez. Todavía no existe una señal suficientemente clara para reducirla a una sola forma."};
+const CIERRE = {
+  cuerpo:[
+    "Tu presente está claro. Mi pasado todavía no. Hoy reconoces lo que hemos construido juntos.",
+    "Pero mi historia no comenzó el día en que llegué a ti. Antes tuve otras formas, otros sonidos, otros lugares.",
+    "Realm-e va a buscar esa historia para ti. Te contará solo lo que se pueda comprobar — y te dirá con honestidad cuando algo no se pueda. Las primeras investigaciones de La geometría de tu nombre están por comenzar. Tu lugar en la primera edición ya está guardado.",
+  ],
+  fraseFinal:"Tú ya me contaste cómo llegué a ser parte de tu vida. Ahora falta descubrir quién era antes de encontrarte.",
+};
+
+// ---------- Matriz (copiada literal de lib/invitacion/matriz.ts) ----------
+
+const MAPA_ESTATICO = [
+  {p:"q1",o:"registroDistinto",perfil:"esculpido",peso:.5},
+  {p:"q2",o:"yaLoLlevaba",perfil:"raiz-viva",peso:1},{p:"q2",o:"fe",perfil:"raiz-viva",peso:1},{p:"q2",o:"historia",perfil:"raiz-viva",peso:1},
+  {p:"q3",o:"apodoAjeno",perfil:"esculpido",peso:1},{p:"q3",o:"versionCorta",perfil:"esculpido",peso:1},
+  {p:"q3",o:"cadaQuienDistinto",perfil:"esculpido",peso:.5},{p:"q3",o:"otroIdioma",perfil:"frontera",peso:1},
+  {p:"q4",o:"costumbre",perfil:"ligereza",peso:.5},{p:"q4",o:"incomodidad",perfil:"conquistado",peso:1},
+  {p:"q4",o:"costoAceptar",perfil:"conquistado",peso:1},{p:"q4",o:"nuncaPregunte",perfil:"ligereza",peso:.5},
+  {p:"q5",o:"nino",perfil:"conquistado",peso:1},{p:"q5",o:"adulto",perfil:"conquistado",peso:1},
+  {p:"q5",o:"segunLugar",perfil:"frontera",peso:1},{p:"q5",o:"parcial",perfil:"conquistado",peso:1},
+  {p:"q5",o:"nunca",perfil:"ligereza",peso:1},{p:"q5",o:"nuncaPensado",perfil:"ligereza",peso:.5},
+  {p:"q6",o:"cambiaSegunQuien",perfil:"frontera",peso:1},{p:"q6",o:"familiaDistinto",perfil:"frontera",peso:1},{p:"q6",o:"otroIdioma",perfil:"frontera",peso:1},
+  {p:"q7",o:"corrijoAVeces",perfil:"frontera",peso:1},{p:"q7",o:"dejoPasar",perfil:"ligereza",peso:.5},
+  {p:"q7",o:"adapteVersion",perfil:"frontera",peso:1},{p:"q7",o:"molestaCallo",perfil:"conquistado",peso:.5},{p:"q7",o:"daIgual",perfil:"ligereza",peso:1},
+  {p:"q8",o:"masCarino",perfil:"conquistado",peso:1},{p:"q8",o:"funcional",perfil:"ligereza",peso:1},
+  {p:"q8",o:"haciendoPaces",perfil:"conquistado",peso:1},{p:"q8",o:"vinculo",perfil:"raiz-viva",peso:1},{p:"q8",o:"nuncaPensado",perfil:"ligereza",peso:.5},
+];
+
+function tiene(respuestas,p,...ops){const e=respuestas[p]||[];return ops.some(o=>e.includes(o));}
+
+function calcularPerfil(respuestas){
+  if(tiene(respuestas,"q2","creado")) return {perfil:"creado",matiz:null};
+  const senales=[];
+  for(const m of MAPA_ESTATICO){ if(tiene(respuestas,m.p,m.o)) senales.push({perfil:m.perfil,peso:m.peso,p:m.p}); }
+  if(tiene(respuestas,"q7","corrijoSiempre")){
+    const huboIncomodidad = tiene(respuestas,"q4","incomodidad","costoAceptar") || tiene(respuestas,"q5","nino","adulto","parcial") || tiene(respuestas,"q8","haciendoPaces");
+    const dependeContexto = tiene(respuestas,"q6","cambiaSegunQuien","familiaDistinto","otroIdioma");
+    if(huboIncomodidad) senales.push({perfil:"conquistado",peso:1,p:"q7"});
+    else if(dependeContexto) senales.push({perfil:"frontera",peso:1,p:"q7"});
+  }
+  const totales=new Map(), preguntasPorPerfil=new Map();
+  for(const s of senales){
+    totales.set(s.perfil,(totales.get(s.perfil)||0)+s.peso);
+    if(!preguntasPorPerfil.has(s.perfil)) preguntasPorPerfil.set(s.perfil,new Set());
+    preguntasPorPerfil.get(s.perfil).add(s.p);
+  }
+  const ordenados=[...totales.entries()].sort((a,b)=>b[1]-a[1]);
+  if(!ordenados.length) return {perfil:null,matiz:null};
+  const [ganador,puntos]=ordenados[0], segundo=ordenados[1];
+  const conteoGanador=senales.filter(s=>s.perfil===ganador).length;
+  const preguntasDistintas=preguntasPorPerfil.get(ganador)?.size||0;
+  const diferencia=puntos-(segundo?.[1]||0);
+  if(!(conteoGanador>=3 && preguntasDistintas>=2 && diferencia>=1)) return {perfil:null,matiz:null};
+  const matiz = segundo && puntos===segundo[1] ? segundo[0] : null;
+  return {perfil:ganador,matiz};
+}
+
+// ---------- Estado + localStorage (clave realme_inv_v3, heredada del artifact previo) ----------
+
+const LS_KEY = "realme_inv_v3";
+function cargarEstado(){
+  try{ const raw=localStorage.getItem(LS_KEY); return raw?JSON.parse(raw):{}; }catch{ return {}; }
+}
+let D = cargarEstado();
+function guardar(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(D)); }catch(e){ /* cuota llena: seguimos en memoria */ } }
+
+D.step = D.step ?? 0;
+D.nombre = D.nombre ?? "";
+D.correo = D.correo ?? "";
+D.respuestas = D.respuestas ?? {};
+D.textos = D.textos ?? {};
+D.condicionalQ5 = D.condicionalQ5 ?? "";
+
+// ---------- Capacidad real de micrófono (nunca se muestra un botón que no graba) ----------
+
+const MIC_DISPONIBLE = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && typeof MediaRecorder !== "undefined");
+
+// ---------- Pasos ----------
+
+const STEP_ENTRADA=0, STEP_REGISTRO=1, STEP_CONFIRMACION=2, STEP_UMBRAL=3, STEP_PREGUNTAS_INICIO=4;
+const STEP_PERFIL = STEP_PREGUNTAS_INICIO + PREGUNTAS.length;
+const STEP_CIERRE = STEP_PERFIL + 1;
+
+function primerLabel(labels){ labels=labels.filter(Boolean); if(!labels.length) return ""; if(labels.length===1) return labels[0]; return labels.slice(0,-1).join(", ")+" y "+labels[labels.length-1]; }
+
+function capituloIndex(id){
+  if(["q1","q2","q3"].includes(id)) return 0;
+  if(["q4","q5"].includes(id)) return 1;
+  if(["q6","q7"].includes(id)) return 2;
+  return 3;
+}
+
+function esc(s){ const d=document.createElement("div"); d.textContent=s??""; return d.innerHTML; }
+
+const app = document.getElementById("app");
+
+function render(){
+  guardar();
+  const step = D.step;
+  let html = `<div class="brand">La Geometría de tu Nombre</div>`;
+
+  const preguntaActual = (step>=STEP_PREGUNTAS_INICIO && step<STEP_PERFIL) ? PREGUNTAS[step-STEP_PREGUNTAS_INICIO] : null;
+  const ci = preguntaActual ? capituloIndex(preguntaActual.id) : -1;
+  if(ci>=0){
+    html += `<div class="dots">` + [0,1,2,3].map(i=>`<span class="dot${i<=ci?" on":""}"></span>`).join("") + `</div>`;
+  }
+
+  html += `<div class="step">`;
+
+  if(step===STEP_ENTRADA){
+    html += `
+      <div class="center" style="padding:2.5rem 0;display:flex;flex-direction:column;gap:1.5rem;">
+        <h1>${esc(ENTRADA.titulo)}</h1>
+        <p class="maxw">${esc(ENTRADA.cuerpo)}</p>
+        <button class="btn center-self" id="btn-entrada">${esc(ENTRADA.boton)}</button>
+      </div>`;
+  }
+  else if(step===STEP_REGISTRO){
+    html += `
+      <div style="display:flex;flex-direction:column;gap:1.25rem;padding:2rem 0;">
+        <p>${esc(REGISTRO.intro)}</p>
+        <label class="field">${esc(REGISTRO.labelNombre)}
+          <input type="text" id="in-nombre" placeholder="Tu nombre completo" value="${esc(D.nombre)}">
+        </label>
+        <p class="small">${esc(REGISTRO.avisoCorreo)}</p>
+        <label class="field">${esc(REGISTRO.labelCorreo)}
+          <input type="email" id="in-correo" placeholder="tu@correo.com" value="${esc(D.correo)}">
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="in-consiente" ${D.consiente?"checked":""}>
+          Acepto que Realm-e guarde mi nombre y correo para reservar mi lugar en la primera edición.
+        </label>
+        <p class="small" style="font-style:italic">${esc(REGISTRO.pie)}</p>
+        <div id="registro-error" class="err"></div>
+        <button class="btn" id="btn-registro" style="align-self:flex-start" ${(!D.nombre?.trim()||!D.correo?.trim()||!D.consiente)?"disabled":""}>${esc(REGISTRO.boton)}</button>
+      </div>`;
+  }
+  else if(step===STEP_CONFIRMACION){
+    html += `
+      <div style="display:flex;flex-direction:column;gap:1.5rem;padding:2.5rem 0;">
+        <p>${esc(REGISTRO.confirmacion)}</p>
+        <button class="btn center-self" id="btn-continuar-confirm">Continuar</button>
+      </div>`;
+  }
+  else if(step===STEP_UMBRAL){
+    html += `
+      <div class="center" style="padding:2.5rem 0;display:flex;flex-direction:column;gap:1.5rem;">
+        <h1 class="big">${esc(D.nombre||"Tu nombre")}</h1>
+        <p class="maxw">Soy tu nombre. El que has escuchado toda tu vida.</p>
+        <p class="maxw">Hoy vamos a tener una plática — hay cosas que solo tú sabes de mí, y quiero preguntártelas.</p>
+        <button class="btn center-self" id="btn-empecemos">Empecemos</button>
+      </div>`;
+  }
+  else if(preguntaActual){
+    html += renderPregunta(preguntaActual);
+  }
+  else if(step===STEP_PERFIL){
+    const r = calcularPerfil(D.respuestas);
+    html += `
+      <div style="display:flex;flex-direction:column;gap:1.5rem;padding:2rem 0;">
+        <p>${esc(ANTES_PERFIL.antes)}</p>
+        <p class="frase">${esc(ANTES_PERFIL.fraseClave)}</p>
+        <p>${esc(ANTES_PERFIL.gancho)}</p>
+        <hr>
+        <p>${esc(ANTES_PERFIL.manifiestoIntro)}</p>
+        <div class="perfil-box">`;
+    if(r.perfil){
+      html += `<h3>${esc(PERFILES[r.perfil].titulo)}</h3><p>${esc(PERFILES[r.perfil].texto)}</p>`;
+      if(r.matiz){
+        html += `<p class="small" style="margin-top:.9rem">Tu forma principal: ${esc(PERFILES[r.perfil].titulo)}. También aparece una señal de ${esc(PERFILES[r.matiz].titulo)}…</p>`;
+      }
+    } else {
+      html += `<h3>${esc(BAJA_CERTEZA.titulo)}</h3><p>${esc(BAJA_CERTEZA.texto)}</p>`;
+    }
+    html += `</div>
+        <p style="font-style:italic">${esc(ANTES_PERFIL.cierre)}</p>
+        <button class="btn center-self" id="btn-cierre">Continuar</button>
+      </div>`;
+    D._resultado = r;
+  }
+  else if(step===STEP_CIERRE){
+    html += `<div style="display:flex;flex-direction:column;gap:1.25rem;padding:2.5rem 0;">`;
+    for(const p of CIERRE.cuerpo) html += `<p>${esc(p)}</p>`;
+    html += `<p class="frase" style="font-size:1.2rem;margin-top:1rem">${esc(CIERRE.fraseFinal)}</p>`;
+    html += renderResumen();
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  app.innerHTML = html;
+  wireStep(preguntaActual);
+}
+
+function renderPregunta(preguntaActual){
+  let antes = preguntaActual.antes;
+  if(antes.includes("__DESPUES_Q1__")){
+    const sel = D.respuestas["q1"]?.[0];
+    const embed = sel ? (EMBED_Q1[sel]||"alguien") : "alguien";
+    antes = antes.replace("__DESPUES_Q1__", despuesQ1(embed));
+  }
+  if(antes.includes("__DESPUES_Q3__")){
+    const textoLibre = (D.textos["q3"]||"").trim();
+    const seleccionadas = D.respuestas["q3"]||[];
+    const nombreVivido = textoLibre.length>0 ? textoLibre : (primerLabel(seleccionadas.map(id=>EMBED_Q3[id]).filter(Boolean)) || D.nombre || "este nombre");
+    antes = antes.replace("__DESPUES_Q3__", despuesQ3(D.nombre||"tu nombre registrado", nombreVivido));
+  }
+  if(antes.includes("__DESPUES_Q5__")) antes = antes.replace("__DESPUES_Q5__", DESPUES_Q5);
+  if(antes.includes("__DESPUES_Q7__")) antes = antes.replace("__DESPUES_Q7__", DESPUES_Q7);
+
+  const parrafos = antes.split("\n\n");
+  let html = `<div style="display:flex;flex-direction:column;gap:1.25rem;padding:1.5rem 0;">`;
+  parrafos.forEach((par,i)=>{
+    html += `<p>${esc(par)}</p>`;
+    if(i===0 && parrafos.length>1 && preguntaActual.fraseClave){
+      html += `<p class="frase">${esc(preguntaActual.fraseClave)}</p>`;
+    }
+  });
+  if(parrafos.length===1 && preguntaActual.fraseClave){
+    html += `<p class="frase">${esc(preguntaActual.fraseClave)}</p>`;
+  }
+  html += `<h2>${esc(preguntaActual.pregunta)}</h2>`;
+
+  const yaTexto = D.textos[preguntaActual.id] || "";
+
+  if(preguntaActual.textoEsPrincipal){
+    html += `
+      <div style="display:flex;flex-direction:column;gap:.75rem;">
+        <textarea id="ta-${preguntaActual.id}" placeholder="${esc(preguntaActual.placeholderTexto||"")}">${esc(yaTexto)}</textarea>
+        ${renderMic(preguntaActual.id)}
+      </div>`;
+  }
+
+  if(preguntaActual.opciones){
+    html += `<div class="opciones">`;
+    const seleccionadas = D.respuestas[preguntaActual.id]||[];
+    for(const op of preguntaActual.opciones){
+      const sel = seleccionadas.includes(op.id);
+      html += `<button class="op${sel?" sel":""}" data-op="${esc(op.id)}" data-q="${preguntaActual.id}" data-multi="${preguntaActual.multi}">${esc(op.label)}</button>`;
+    }
+    html += `</div>`;
+  }
+
+  if(preguntaActual.campoCondicional){
+    const activa = (D.respuestas[preguntaActual.id]||[]).some(id=>preguntaActual.campoCondicional.activaSi.includes(id));
+    if(activa){
+      html += `<input type="text" id="in-condicional" placeholder="${esc(preguntaActual.campoCondicional.placeholder)}" value="${esc(D.condicionalQ5)}">`;
+    }
+  }
+
+  if(!preguntaActual.textoEsPrincipal && (preguntaActual.permiteTexto || preguntaActual.permiteVoz)){
+    html += `<div style="display:flex;flex-direction:column;gap:.75rem;padding-top:.25rem;">`;
+    if(preguntaActual.permiteTexto){
+      html += `<textarea id="ta-${preguntaActual.id}" placeholder="${esc(preguntaActual.notaSuave||'Escribirlo (opcional)')}">${esc(yaTexto)}</textarea>`;
+    }
+    if(preguntaActual.permiteVoz){
+      html += renderMic(preguntaActual.id);
+    }
+    html += `</div>`;
+  }
+
+  const puedeContinuar = !preguntaActual.opciones || (D.respuestas[preguntaActual.id]||[]).length>0;
+  html += `<button class="btn" id="btn-continuar" style="align-self:flex-start;margin-top:.5rem" ${puedeContinuar?"":"disabled"}>Continuar</button>`;
+  html += `</div>`;
+  return html;
+}
+
+// Grabación real cuando el navegador lo permite; si no, nota honesta — nunca
+// un botón de micrófono que aparenta grabar y no graba.
+function renderMic(qid){
+  if(!MIC_DISPONIBLE){
+    return `<div class="mic-note">Este navegador no permite grabar voz aquí. Puedes escribirlo arriba — vale exactamente lo mismo.</div>`;
+  }
+  return `<div class="mic-wrap" data-mic="${qid}">
+    <button class="mic-btn" data-mic-action="pedir" data-q="${qid}">🎙 Contarlo con mi voz</button>
+  </div>`;
+}
+
+function renderResumen(){
+  const r = D._resultado || calcularPerfil(D.respuestas);
+  const perfilTxt = r.perfil ? PERFILES[r.perfil].titulo : BAJA_CERTEZA.titulo;
+  let txt = `BRÚJULA — La Geometría de tu Nombre\n`;
+  txt += `Nombre: ${D.nombre}\n`;
+  txt += `Perfil: ${perfilTxt}${r.matiz?` (con matiz de ${PERFILES[r.matiz].titulo})`:""}\n\n`;
+  PREGUNTAS.forEach((q,i)=>{
+    const sel = (D.respuestas[q.id]||[]).map(id=>{
+      const op=(q.opciones||[]).find(o=>o.id===id); return op?op.label:id;
+    });
+    const texto = (D.textos[q.id]||"").trim();
+    txt += `${i+1}. ${q.pregunta}\n`;
+    if(sel.length) txt += `   Marcó: ${sel.join(", ")}\n`;
+    if(texto) txt += `   Escribió: ${texto}\n`;
+    if(!sel.length && !texto) txt += `   (sin respuesta)\n`;
+  });
+  return `
+    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.75rem;">
+      <p class="small" style="font-style:italic">Guardado en este dispositivo. Aquí tienes tu resumen — cópialo si quieres guardarlo aparte:</p>
+      <div class="resumen" id="resumen-txt">${esc(txt)}</div>
+      <div class="copybar">
+        <button class="btn" id="btn-copiar" style="padding:.6rem 1.2rem;font-size:.75rem">Copiar resumen</button>
+        <span id="copiado-msg" class="small" style="display:none">Copiado ✓</span>
+      </div>
+    </div>`;
+}
+
+// ---------- Grabador de voz real (mismo comportamiento que VoiceRecorder.tsx corregido) ----------
+
+const grabaciones = {}; // qid -> {estado, mediaRecorder, chunks, audioUrl}
+
+function micState(qid){ return grabaciones[qid] || (grabaciones[qid]={estado:"inicial",chunks:[],mediaRecorder:null,audioUrl:null}); }
+
+function renderMicEstado(qid){
+  const wrap = document.querySelector(`[data-mic="${qid}"]`);
+  if(!wrap) return;
+  const st = micState(qid);
+  if(st.estado==="permiso"){
+    wrap.outerHTML = `<div class="mic-note" data-mic="${qid}">
+      <p style="margin-bottom:.6rem">Al grabar, guardamos tu voz solo como contexto para la investigación de tu nombre. Nunca se procesa con IA ni se comparte.</p>
+      <button class="mic-btn" data-mic-action="grabar" data-q="${qid}">Entendido, grabar</button>
+    </div>`;
+  } else if(st.estado==="grabando"){
+    wrap.outerHTML = `<div class="mic-wrap" data-mic="${qid}">
+      <button class="mic-btn rec" data-mic-action="detener" data-q="${qid}">● Grabando… toca para detener</button>
+    </div>`;
+  } else if(st.estado==="listo"){
+    wrap.outerHTML = `<div class="mic-wrap" data-mic="${qid}">
+      <audio controls src="${st.audioUrl}"></audio>
+      <button class="link" data-mic-action="borrar" data-q="${qid}">borrar</button>
+    </div>`;
+  } else if(st.estado==="error"){
+    wrap.outerHTML = `<div class="mic-note" data-mic="${qid}">No pudimos acceder al micrófono. Puedes escribirlo en su lugar.</div>`;
+  } else {
+    wrap.outerHTML = `<div class="mic-wrap" data-mic="${qid}">
+      <button class="mic-btn" data-mic-action="pedir" data-q="${qid}">🎙 Contarlo con mi voz</button>
+    </div>`;
+  }
+  wireMic();
+}
+
+async function empezarGrabacion(qid){
+  const st = micState(qid);
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    const mr = new MediaRecorder(stream);
+    st.chunks = [];
+    mr.ondataavailable = e=>st.chunks.push(e.data);
+    mr.onstop = ()=>{
+      const tipo = mr.mimeType || "audio/webm";
+      const blob = new Blob(st.chunks,{type:tipo});
+      st.audioUrl = URL.createObjectURL(blob);
+      st.estado = "listo";
+      stream.getTracks().forEach(t=>t.stop());
+      renderMicEstado(qid);
+    };
+    st.mediaRecorder = mr;
+    mr.start();
+    st.estado = "grabando";
+    renderMicEstado(qid);
+  }catch(e){
+    st.estado = "error";
+    renderMicEstado(qid);
+  }
+}
+
+function wireMic(){
+  document.querySelectorAll("[data-mic-action]").forEach(btn=>{
+    btn.onclick = ()=>{
+      const qid = btn.dataset.q, action = btn.dataset.micAction;
+      const st = micState(qid);
+      if(action==="pedir"){ st.estado="permiso"; renderMicEstado(qid); }
+      else if(action==="grabar"){ empezarGrabacion(qid); }
+      else if(action==="detener"){ st.mediaRecorder?.stop(); }
+      else if(action==="borrar"){ st.estado="inicial"; st.audioUrl=null; renderMicEstado(qid); }
+    };
+  });
+}
+
+// ---------- Eventos por paso ----------
+
+function guardarTextosVisibles(){
+  document.querySelectorAll("textarea[id^='ta-']").forEach(ta=>{
+    const qid = ta.id.replace("ta-","");
+    D.textos[qid] = ta.value;
+  });
+  const cond = document.getElementById("in-condicional");
+  if(cond) D.condicionalQ5 = cond.value;
+}
+
+function wireStep(preguntaActual){
+  const btnEntrada = document.getElementById("btn-entrada");
+  if(btnEntrada) btnEntrada.onclick = ()=>{ D.step=STEP_REGISTRO; render(); };
+
+  const inNombre = document.getElementById("in-nombre");
+  const inCorreo = document.getElementById("in-correo");
+  const inConsiente = document.getElementById("in-consiente");
+  const btnRegistro = document.getElementById("btn-registro");
+  function actualizaBtnRegistro(){
+    if(!btnRegistro) return;
+    btnRegistro.disabled = !(inNombre.value.trim() && inCorreo.value.trim() && inConsiente.checked);
+  }
+  if(inNombre){ inNombre.oninput=()=>{ D.nombre=inNombre.value; actualizaBtnRegistro(); }; }
+  if(inCorreo){ inCorreo.oninput=()=>{ D.correo=inCorreo.value; actualizaBtnRegistro(); }; }
+  if(inConsiente){ inConsiente.onchange=()=>{ D.consiente=inConsiente.checked; actualizaBtnRegistro(); }; }
+  if(btnRegistro){
+    btnRegistro.onclick = ()=>{
+      const errBox = document.getElementById("registro-error");
+      const correoValido = /\S+@\S+\.\S+/.test(inCorreo.value.trim());
+      if(!correoValido){ errBox.textContent = "Ese correo no parece válido."; return; }
+      if(!inNombre.value.trim()){ errBox.textContent = "Escribe tu nombre completo."; return; }
+      errBox.textContent = "";
+      D.nombre = inNombre.value.trim();
+      D.correo = inCorreo.value.trim();
+      D.step = STEP_CONFIRMACION;
+      render();
+    };
+  }
+
+  const btnConfirm = document.getElementById("btn-continuar-confirm");
+  if(btnConfirm) btnConfirm.onclick = ()=>{ D.step=STEP_UMBRAL; render(); };
+
+  const btnEmpecemos = document.getElementById("btn-empecemos");
+  if(btnEmpecemos) btnEmpecemos.onclick = ()=>{ D.step=STEP_PREGUNTAS_INICIO; render(); };
+
+  if(preguntaActual){
+    document.querySelectorAll(".op").forEach(op=>{
+      op.onclick = ()=>{
+        const qid=op.dataset.q, oid=op.dataset.op, multi=op.dataset.multi==="true";
+        const actuales = D.respuestas[qid] || [];
+        if(multi){
+          D.respuestas[qid] = actuales.includes(oid) ? actuales.filter(o=>o!==oid) : [...actuales, oid];
+        } else {
+          D.respuestas[qid] = [oid];
+        }
+        guardarTextosVisibles();
+        render();
+      };
+    });
+    wireMic();
+    const btnContinuar = document.getElementById("btn-continuar");
+    if(btnContinuar) btnContinuar.onclick = ()=>{
+      guardarTextosVisibles();
+      D.step += 1;
+      render();
+    };
+  }
+
+  const btnCierrePerfil = document.getElementById("btn-cierre");
+  if(btnCierrePerfil) btnCierrePerfil.onclick = ()=>{ D.step=STEP_CIERRE; render(); };
+
+  const btnCopiar = document.getElementById("btn-copiar");
+  if(btnCopiar){
+    btnCopiar.onclick = async ()=>{
+      const txt = document.getElementById("resumen-txt").textContent;
+      const msg = document.getElementById("copiado-msg");
+      try{
+        await navigator.clipboard.writeText(txt);
+      }catch(e){
+        // Fallback para navegadores sin permiso de portapapeles.
+        const ta = document.createElement("textarea");
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand("copy"); }catch(_e){}
+        document.body.removeChild(ta);
+      }
+      if(msg){ msg.style.display="inline"; setTimeout(()=>{msg.style.display="none";}, 2000); }
+    };
+  }
+}
+
+render();
+</script>
+</body>
+</html>
