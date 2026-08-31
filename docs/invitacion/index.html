@@ -91,7 +91,7 @@ const PREGUNTAS = [
   {
     id:"q1",
     antes:"Yo existía mucho antes de que tú nacieras. Pero hubo un momento exacto en que alguien tomó una decisión. Alguien eligió que yo sería la palabra con la que comenzarían a reconocerte.",
-    pregunta:"¿Quién me eligió para ti?", multi:false, permiteTexto:true, permiteVoz:true,
+    pregunta:"¿Quién me eligió para ti?", multi:true, permiteTexto:true, permiteVoz:true,
     opciones:[
       {id:"mama",label:"Mi mamá"},{id:"papa",label:"Mi papá"},{id:"ambos",label:"Los dos, juntos"},
       {id:"abuelo",label:"Mi abuela o abuelo"},{id:"otroFamiliar",label:"Una tía, tío u otra persona de la familia"},
@@ -102,7 +102,7 @@ const PREGUNTAS = [
   {
     id:"q2",
     antes:"__DESPUES_Q1__ Pero elegir un nombre casi nunca es solo elegir una palabra. Detrás suele existir una persona, un recuerdo, un deseo… o una razón que nunca llegó a contarse.",
-    pregunta:"¿Sabes por qué me eligieron para ti?", multi:false, permiteTexto:true, permiteVoz:true,
+    pregunta:"¿Sabes por qué me eligieron para ti?", multi:true, permiteTexto:true, permiteVoz:true,
     opciones:[
       {id:"yaLoLlevaba",label:"Alguien de la familia ya lo llevaba"},{id:"fe",label:"Por la fe: un santo, la biblia, una promesa"},
       {id:"personajeCancion",label:"Por un personaje, una canción, una época"},{id:"sonido",label:"Simplemente les gustó cómo sonaba"},
@@ -125,7 +125,7 @@ const PREGUNTAS = [
     id:"q4",
     antes:"__DESPUES_Q3__\n\nHe estado contigo en cada presentación, cada firma, cada vez que alguien quiso llamarte. A veces fui orgullo. A veces costumbre. Tal vez, en algún momento, también fui distancia.",
     fraseClave:"Una cosa es el nombre que recibiste. Otra, el nombre que hiciste tuyo.",
-    pregunta:"¿Cómo te has sentido al llevarme?", multi:false, permiteTexto:true, permiteVoz:true,
+    pregunta:"¿Cómo te has sentido al llevarme?", multi:true, permiteTexto:true, permiteVoz:true,
     opciones:[
       {id:"orgullo",label:"Orgullo"},{id:"carino",label:"Cariño"},{id:"costumbre",label:"Costumbre — ni lo pienso"},
       {id:"incomodidad",label:"A veces, incomodidad"},{id:"costoAceptar",label:"Me costó aceptarlo"},
@@ -135,7 +135,7 @@ const PREGUNTAS = [
   {
     id:"q5",
     antes:"Eso que sentiste también forma parte de mi historia. Porque un nombre no solo se recibe: también se acepta, se cuestiona, se transforma o se aprende a habitar.",
-    pregunta:"¿Hubo algún momento en que deseaste llamarte de otra manera?", multi:false, permiteTexto:true, permiteVoz:true,
+    pregunta:"¿Hubo algún momento en que deseaste llamarte de otra manera?", multi:true, permiteTexto:true, permiteVoz:true,
     opciones:[
       {id:"nino",label:"Sí, cuando era niña o niño"},{id:"adulto",label:"Sí, ya de adulto"},
       {id:"segunLugar",label:"Solo en ciertos lugares o con cierta gente"},{id:"parcial",label:"Quise cambiar solo una parte (un nombre o un apellido)"},
@@ -157,7 +157,7 @@ const PREGUNTAS = [
   {
     id:"q7",
     antes:"Esa es mi forma más cercana a ti. La que reconoces sin verla escrita. La que lleva tu historia, tu acento y la manera en que aprendiste a responderme.",
-    pregunta:"¿Alguna vez han cambiado, acortado o pronunciado mal tu nombre? ¿Qué hiciste tú con eso?", multi:false, permiteTexto:true, permiteVoz:true,
+    pregunta:"¿Alguna vez han cambiado, acortado o pronunciado mal tu nombre? ¿Qué hiciste tú con eso?", multi:true, permiteTexto:true, permiteVoz:true,
     opciones:[
       {id:"corrijoSiempre",label:"Lo corrijo siempre"},{id:"corrijoAVeces",label:"Lo corrijo solo a veces, según quién"},
       {id:"dejoPasar",label:"Lo dejo pasar"},{id:"adapteVersion",label:"Me adapté: uso otra versión según el lugar"},
@@ -168,7 +168,7 @@ const PREGUNTAS = [
     id:"q8",
     antes:"__DESPUES_Q7__\n\nHe cambiado contigo. No soy exactamente el mismo nombre que recibiste al nacer. Ahora llevo lo que viviste, lo que elegiste conservar y también lo que decidiste transformar.",
     fraseClave:"La manera en que permites que digan tu nombre también revela cómo ocupas tu lugar.",
-    pregunta:"¿Qué lugar ocupo hoy en tu vida?", multi:false, permiteTexto:true, permiteVoz:true,
+    pregunta:"¿Qué lugar ocupo hoy en tu vida?", multi:true, permiteTexto:true, permiteVoz:true,
     opciones:[
       {id:"identidad",label:"Eres parte de mi identidad — me representas"},{id:"masCarino",label:"Te quiero más que antes"},
       {id:"funcional",label:"Eres mi nombre y ya — funcional"},{id:"haciendoPaces",label:"Todavía estamos haciendo las paces"},
@@ -205,7 +205,7 @@ const REGISTRO = {
   avisoCorreo:"Cuando tu acceso a la primera edición esté listo, te avisaremos por correo.",
   labelCorreo:"¿A qué correo te avisamos?",
   boton:"Guardar mi lugar y continuar",
-  confirmacion:"Tu lugar está reservado. Para llegar a los orígenes ocultos de tu nombre, necesitamos el único dato que no está en los registros históricos: cómo lo has vivido tú. Lo que compartas aquí será la brújula de nuestra investigación.",
+  confirmacion:"Para llegar a los orígenes ocultos de tu nombre, necesitamos el único dato que no está en los registros históricos: cómo has vivido tu nombre. Lo que compartas aquí será la brújula de nuestra investigación.",
   pie:"Tu correo se guarda solo para avisarte cuando tu acceso esté listo. Tus respuestas, tu voz y tus historias se quedan solo en este dispositivo.",
 };
 const ANTES_PERFIL = {
@@ -284,6 +284,11 @@ function calcularPerfil(respuestas){
 // ---------- Estado + localStorage (clave realme_inv_v3, heredada del artifact previo) ----------
 
 const LS_KEY = "realme_inv_v3";
+// Web App de Apps Script que guarda cada brújula como Issue en 36BH/Realm-e.
+// Se llena con la URL real tras el deploy (clasp deploy). Si está vacía, el
+// envío a servidor simplemente no ocurre — localStorage sigue siendo la
+// fuente de verdad en el dispositivo y nada se rompe.
+const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbydR7Ha93_isPaDFlMvECsuaGL0Hr1VVn-yTt9GHBaZuOi14ASAErnuKaR6namV_QC7sQ/exec";
 function cargarEstado(){
   try{ const raw=localStorage.getItem(LS_KEY); return raw?JSON.parse(raw):{}; }catch{ return {}; }
 }
@@ -525,7 +530,48 @@ function renderResumen(){
         <button class="btn" id="btn-copiar" style="padding:.6rem 1.2rem;font-size:.75rem">Copiar resumen</button>
         <span id="copiado-msg" class="small" style="display:none">Copiado ✓</span>
       </div>
+      <span id="envio-badge" class="small" style="color:var(--soft)">${D._envioEstado==="ok"?"Guardado también en el servidor ✓":""}</span>
     </div>`;
+}
+
+// ---------- Envío silencioso al backend (Apps Script → Issue en GitHub) ----------
+// No reemplaza localStorage: es un guardado adicional. Si falla (sin internet,
+// endpoint vacío, servidor caído) la experiencia de la persona sigue intacta.
+async function enviarRespuestasAlServidor(){
+  if(!GAS_ENDPOINT || D._envioEstado==="ok" || D._envioEstado==="enviando") return;
+  D._envioEstado = "enviando";
+  try{
+    const r = D._resultado || calcularPerfil(D.respuestas);
+    const respuestas = PREGUNTAS.map(q=>{
+      const seleccionadas = D.respuestas[q.id]||[];
+      const labels = seleccionadas.map(id=>{
+        const op=(q.opciones||[]).find(o=>o.id===id); return op?op.label:id;
+      });
+      return {
+        pregunta: q.pregunta,
+        opciones: labels,
+        texto: (D.textos[q.id]||"").trim(),
+        audio: !!(grabaciones[q.id] && grabaciones[q.id].estado==="listo"),
+      };
+    });
+    const payload = {
+      nombre: D.nombre, correo: D.correo,
+      perfil: r.perfil ? PERFILES[r.perfil].titulo : BAJA_CERTEZA.titulo,
+      matiz: r.matiz ? PERFILES[r.matiz].titulo : "",
+      respuestas,
+    };
+    await fetch(GAS_ENDPOINT, {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"}, // evita preflight CORS en Apps Script
+      body: JSON.stringify(payload),
+    });
+    D._envioEstado = "ok";
+  }catch(e){
+    D._envioEstado = "error"; // fallo silencioso: ya quedó a salvo en localStorage
+  }
+  guardar();
+  const badge = document.getElementById("envio-badge");
+  if(badge) badge.textContent = D._envioEstado==="ok" ? "Guardado también en el servidor ✓" : "";
 }
 
 // ---------- Grabador de voz real (mismo comportamiento que VoiceRecorder.tsx corregido) ----------
@@ -670,7 +716,7 @@ function wireStep(preguntaActual){
   }
 
   const btnCierrePerfil = document.getElementById("btn-cierre");
-  if(btnCierrePerfil) btnCierrePerfil.onclick = ()=>{ D.step=STEP_CIERRE; render(); };
+  if(btnCierrePerfil) btnCierrePerfil.onclick = ()=>{ D.step=STEP_CIERRE; render(); enviarRespuestasAlServidor(); };
 
   const btnCopiar = document.getElementById("btn-copiar");
   if(btnCopiar){
