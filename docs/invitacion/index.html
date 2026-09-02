@@ -54,6 +54,9 @@
   .op.sel{border-color:var(--gold);background:rgba(168,134,61,.24);color:var(--gold-text);font-weight:700;}
   .op-check{font-size:1.15rem;font-weight:700;color:var(--gold-text);flex-shrink:0;line-height:1;}
   .checkbox-row{display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;font-style:italic;color:var(--soft)}
+  .link-inline{background:none;border:0;padding:0;margin:0;font:inherit;font-style:italic;
+    color:var(--gold-text);text-decoration:underline;cursor:pointer;}
+  .politica-texto{border-left:2px solid rgba(168,134,61,.35)}
   .err{color:#7a1f1f;font-size:.9rem}
   .mic-wrap{display:flex;align-items:center;gap:.75rem;}
   .mic-btn{display:flex;align-items:center;gap:.5rem;border:1px solid rgba(74,59,44,.4);
@@ -218,9 +221,9 @@ const REGISTRO = {
 // Momento único de consentimiento (Carril 5, decisión de Bethzy 2026-08-31: Opción A).
 // Sustituye TODO el goteo anterior (pie de registro + checkbox viejo + aviso de voz
 // repetido por pregunta + nota del resumen): un solo momento, aquí, en el registro.
-// El correo de privacidad todavía no existe como dirección real (ver
-// carriles/5-legal-borradores/1-permiso-anotarse.md, "DECIDIR BETHZY") — el placeholder
-// de abajo NO debe publicarse fuera del círculo de familia hasta que ella lo confirme.
+// El correo de privacidad ya es real: priv@realm-e.com (activado 2026-09-02, reenvía a Bethzy).
+// La política completa (texto[]) va oculta detrás del enlace "política de privacidad" en el
+// checkbox, no siempre visible (Bethzy, 2026-09-02).
 // VOZ+CLARIDAD: sello simulado por el agente que construyó este cambio (Carril 3,
 // 2026-08-31) — falta el paso real del Guardián de la Voz y el revisor de claridad
 // (regla 22 de CLAUDE.md); queda pendiente antes de considerarlo definitivo.
@@ -234,7 +237,7 @@ const CONSENTIMIENTO = {
     "Nada se vende. Nada se comparte. Nada se usa para otra cosa.",
     "Puedes pedir que borremos todo cuando quieras, escribiendo a priv@realm-e.com.",
   ],
-  checkConsiente:"Entiendo y quiero continuar.",
+  checkConsiente:"He leído la política de privacidad", // dividido en el template: "política de privacidad" es el enlace que expande texto[]
   checkMarketing:"Avísame también de otras novedades de Realm-e por correo.",
 };
 const ANTES_PERFIL = {
@@ -393,13 +396,15 @@ function render(){
         <label class="field">${esc(REGISTRO.labelCorreo)}
           <input type="email" id="in-correo" placeholder="tu@correo.com" value="${esc(D.correo)}">
         </label>
-        <div class="consentimiento" style="display:flex;flex-direction:column;gap:.35rem">
-          ${CONSENTIMIENTO.texto.map(l=>`<p class="small" style="font-style:italic">${esc(l)}</p>`).join("")}
+        <div class="consentimiento" style="display:flex;flex-direction:column;gap:.5rem">
+          <label class="checkbox-row">
+            <input type="checkbox" id="in-consiente" ${D.consiente?"checked":""}>
+            <span>He leído la <button type="button" id="btn-toggle-politica" class="link-inline">política de privacidad</button></span>
+          </label>
+          <div id="politica-texto" class="politica-texto" style="display:none;flex-direction:column;gap:.35rem;padding-left:1.9rem">
+            ${CONSENTIMIENTO.texto.map(l=>`<p class="small" style="font-style:italic">${esc(l)}</p>`).join("")}
+          </div>
         </div>
-        <label class="checkbox-row">
-          <input type="checkbox" id="in-consiente" ${D.consiente?"checked":""}>
-          ${esc(CONSENTIMIENTO.checkConsiente)}
-        </label>
         <label class="checkbox-row">
           <input type="checkbox" id="in-marketing" ${D.marketing?"checked":""}>
           ${esc(CONSENTIMIENTO.checkMarketing)}
@@ -831,6 +836,9 @@ function wireStep(preguntaActual){
   if(inCorreo){ inCorreo.oninput=()=>{ D.correo=inCorreo.value; actualizaBtnRegistro(); }; }
   if(inConsiente){ inConsiente.onchange=()=>{ D.consiente=inConsiente.checked; actualizaBtnRegistro(); }; }
   if(inMarketing){ inMarketing.onchange=()=>{ D.marketing=inMarketing.checked; }; }
+  const btnPolitica = document.getElementById("btn-toggle-politica");
+  const politicaTexto = document.getElementById("politica-texto");
+  if(btnPolitica && politicaTexto){ btnPolitica.onclick = ()=>{ politicaTexto.style.display = politicaTexto.style.display==="none" ? "flex" : "none"; }; }
   if(btnRegistro){
     btnRegistro.onclick = ()=>{
       const errBox = document.getElementById("registro-error");
