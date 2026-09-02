@@ -47,10 +47,12 @@
   .btn:disabled:hover{background:transparent;color:rgba(74,59,44,.4)}
   .btn.center-self{align-self:center;margin-top:.5rem}
   .opciones{display:flex;flex-direction:column;gap:.5rem;}
-  .op{border:1px solid transparent;background:var(--paper-dark);color:var(--ink);
-    text-align:left;padding:.8rem 1rem;border-radius:6px;font-family:inherit;font-size:.95rem;cursor:pointer;}
+  .op{border:2px solid transparent;background:var(--paper-dark);color:var(--ink);
+    text-align:left;padding:.8rem 1rem;border-radius:6px;font-family:inherit;font-size:.95rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:.75rem;transition:.15s;}
   .op:hover{border-color:rgba(168,134,61,.5)}
-  .op.sel{border-color:var(--gold);color:var(--gold-text);}
+  .op.sel{border-color:var(--gold);background:rgba(168,134,61,.24);color:var(--gold-text);font-weight:700;}
+  .op-check{font-size:1.15rem;font-weight:700;color:var(--gold-text);flex-shrink:0;line-height:1;}
   .checkbox-row{display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;font-style:italic;color:var(--soft)}
   .err{color:#7a1f1f;font-size:.9rem}
   .mic-wrap{display:flex;align-items:center;gap:.75rem;}
@@ -62,10 +64,15 @@
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
   .mic-note{border:1px solid rgba(74,59,44,.3);background:var(--paper-dark);border-radius:6px;
     padding:.8rem 1rem;font-size:.85rem;color:var(--soft)}
-  .perfil-box{border:1px solid rgba(168,134,61,.4);background:var(--paper-dark);border-radius:8px;padding:1.3rem;}
-  .perfil-box h3{font-family:Georgia,serif;font-size:1.4rem;color:var(--gold-text);margin:0 0 .7rem;}
+  .mic-listo{border:1px solid rgba(168,134,61,.5);background:var(--paper-dark);border-radius:8px;
+    padding:.9rem 1rem;display:flex;flex-direction:column;gap:.65rem;}
+  .mic-listo-msg{font-size:.9rem;font-weight:700;color:var(--gold-text);}
+  .mic-btn-borrar{align-self:flex-start;display:flex;align-items:center;gap:.4rem;
+    border:1px solid rgba(74,59,44,.4);background:transparent;color:var(--soft);
+    padding:.5rem 1rem;border-radius:6px;font-family:inherit;font-size:.8rem;cursor:pointer;}
+  .mic-btn-borrar:hover{border-color:#7a1f1f;color:#7a1f1f}
   hr{border:0;border-top:1px solid var(--paper-dark);margin:.5rem 0;}
-  audio{height:32px}
+  audio{height:38px;width:100%}
   .resumen{white-space:pre-wrap;font-size:.85rem;background:var(--paper-dark);border-radius:6px;
     padding:1rem;border:1px solid rgba(74,59,44,.25);max-height:40vh;overflow:auto;}
   .copybar{display:flex;gap:.6rem;flex-wrap:wrap}
@@ -206,7 +213,29 @@ const REGISTRO = {
   labelCorreo:"¿A qué correo te avisamos?",
   boton:"Guardar mi lugar y continuar",
   confirmacion:"Para llegar a los orígenes ocultos de tu nombre, necesitamos el único dato que no está en los registros históricos: cómo has vivido tu nombre. Lo que compartas aquí será la brújula de nuestra investigación.",
-  pie:"Tu correo se guarda solo para avisarte cuando tu acceso esté listo. Tus respuestas, tu voz y tus historias se quedan solo en este dispositivo.",
+};
+
+// Momento único de consentimiento (Carril 5, decisión de Bethzy 2026-08-31: Opción A).
+// Sustituye TODO el goteo anterior (pie de registro + checkbox viejo + aviso de voz
+// repetido por pregunta + nota del resumen): un solo momento, aquí, en el registro.
+// El correo de privacidad todavía no existe como dirección real (ver
+// carriles/5-legal-borradores/1-permiso-anotarse.md, "DECIDIR BETHZY") — el placeholder
+// de abajo NO debe publicarse fuera del círculo de familia hasta que ella lo confirme.
+// VOZ+CLARIDAD: sello simulado por el agente que construyó este cambio (Carril 3,
+// 2026-08-31) — falta el paso real del Guardián de la Voz y el revisor de claridad
+// (regla 22 de CLAUDE.md); queda pendiente antes de considerarlo definitivo.
+const CONSENTIMIENTO = {
+  texto:[
+    "Antes de empezar, esto es lo que hacemos con lo que compartas.",
+    "Guardamos tu nombre, tu correo y tus respuestas.",
+    "Los usamos solo para construir tu Tomo.",
+    "Si grabas tu voz, primero intentamos convertirla en texto en tu propio teléfono.",
+    "Si eso no funciona, guardamos el audio para que la investigación de tu nombre pueda usarlo.",
+    "Nada se vende. Nada se comparte. Nada se usa para otra cosa.",
+    "Puedes pedir que borremos todo cuando quieras, escribiendo a priv@realm-e.com.",
+  ],
+  checkConsiente:"Entiendo y quiero continuar.",
+  checkMarketing:"Avísame también de otras novedades de Realm-e por correo.",
 };
 const ANTES_PERFIL = {
   antes:"Ahora ya conoces la parte de mi historia que solo tú podías contar. Sabes cómo llegué a ti, cómo me llamas, cómo me hiciste tuyo, cómo debo sonar y qué lugar ocupo en tu vida.",
@@ -301,10 +330,17 @@ D.correo = D.correo ?? "";
 D.respuestas = D.respuestas ?? {};
 D.textos = D.textos ?? {};
 D.condicionalQ5 = D.condicionalQ5 ?? "";
+D.marketing = D.marketing ?? false;
 
 // ---------- Capacidad real de micrófono (nunca se muestra un botón que no graba) ----------
 
 const MIC_DISPONIBLE = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && typeof MediaRecorder !== "undefined");
+
+// Camino 1 del plan de voz (Bethzy, 2026-08-31): intentar transcribir gratis
+// en el propio teléfono con la Web Speech API. Si el navegador no la trae,
+// simplemente no se intenta — se cae directo al camino 2 (guardar el audio).
+const SR_CTOR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const TRANSCRIPCION_DISPONIBLE = !!SR_CTOR;
 
 // ---------- Pasos ----------
 
@@ -357,11 +393,17 @@ function render(){
         <label class="field">${esc(REGISTRO.labelCorreo)}
           <input type="email" id="in-correo" placeholder="tu@correo.com" value="${esc(D.correo)}">
         </label>
+        <div class="consentimiento" style="display:flex;flex-direction:column;gap:.35rem">
+          ${CONSENTIMIENTO.texto.map(l=>`<p class="small" style="font-style:italic">${esc(l)}</p>`).join("")}
+        </div>
         <label class="checkbox-row">
           <input type="checkbox" id="in-consiente" ${D.consiente?"checked":""}>
-          Acepto que Realm-e guarde mi nombre y correo para reservar mi lugar en la primera edición.
+          ${esc(CONSENTIMIENTO.checkConsiente)}
         </label>
-        <p class="small" style="font-style:italic">${esc(REGISTRO.pie)}</p>
+        <label class="checkbox-row">
+          <input type="checkbox" id="in-marketing" ${D.marketing?"checked":""}>
+          ${esc(CONSENTIMIENTO.checkMarketing)}
+        </label>
         <div id="registro-error" class="err"></div>
         <button class="btn" id="btn-registro" style="align-self:flex-start" ${(!D.nombre?.trim()||!D.correo?.trim()||!D.consiente)?"disabled":""}>${esc(REGISTRO.boton)}</button>
       </div>`;
@@ -393,17 +435,16 @@ function render(){
         <p class="frase">${esc(ANTES_PERFIL.fraseClave)}</p>
         <p>${esc(ANTES_PERFIL.gancho)}</p>
         <hr>
-        <p>${esc(ANTES_PERFIL.manifiestoIntro)}</p>
-        <div class="perfil-box">`;
+        <p>${esc(ANTES_PERFIL.manifiestoIntro)}</p>`;
     if(r.perfil){
-      html += `<h3>${esc(PERFILES[r.perfil].titulo)}</h3><p>${esc(PERFILES[r.perfil].texto)}</p>`;
+      html += `<h2>${esc(PERFILES[r.perfil].titulo)}</h2><p>${esc(PERFILES[r.perfil].texto)}</p>`;
       if(r.matiz){
         html += `<p class="small" style="margin-top:.9rem">Tu forma principal: ${esc(PERFILES[r.perfil].titulo)}. También aparece una señal de ${esc(PERFILES[r.matiz].titulo)}…</p>`;
       }
     } else {
-      html += `<h3>${esc(BAJA_CERTEZA.titulo)}</h3><p>${esc(BAJA_CERTEZA.texto)}</p>`;
+      html += `<h2>${esc(BAJA_CERTEZA.titulo)}</h2><p>${esc(BAJA_CERTEZA.texto)}</p>`;
     }
-    html += `</div>
+    html += `
         <p style="font-style:italic">${esc(ANTES_PERFIL.cierre)}</p>
         <button class="btn center-self" id="btn-cierre">Continuar</button>
       </div>`;
@@ -411,7 +452,9 @@ function render(){
   }
   else if(step===STEP_CIERRE){
     html += `<div style="display:flex;flex-direction:column;gap:1.25rem;padding:2.5rem 0;">`;
-    for(const p of CIERRE.cuerpo) html += `<p>${esc(p)}</p>`;
+    CIERRE.cuerpo.forEach((p)=>{
+      html += `<p>${esc(p)}</p>`;
+    });
     html += `<p class="frase" style="font-size:1.2rem;margin-top:1rem">${esc(CIERRE.fraseFinal)}</p>`;
     html += renderResumen();
     html += `</div>`;
@@ -466,7 +509,7 @@ function renderPregunta(preguntaActual){
     const seleccionadas = D.respuestas[preguntaActual.id]||[];
     for(const op of preguntaActual.opciones){
       const sel = seleccionadas.includes(op.id);
-      html += `<button class="op${sel?" sel":""}" data-op="${esc(op.id)}" data-q="${preguntaActual.id}" data-multi="${preguntaActual.multi}">${esc(op.label)}</button>`;
+      html += `<button class="op${sel?" sel":""}" data-op="${esc(op.id)}" data-q="${preguntaActual.id}" data-multi="${preguntaActual.multi}"><span>${esc(op.label)}</span>${sel?'<span class="op-check">✓</span>':''}</button>`;
     }
     html += `</div>`;
   }
@@ -502,7 +545,7 @@ function renderMic(qid){
     return `<div class="mic-note">Este navegador no permite grabar voz aquí. Puedes escribirlo arriba — vale exactamente lo mismo.</div>`;
   }
   return `<div class="mic-wrap" data-mic="${qid}">
-    <button class="mic-btn" data-mic-action="pedir" data-q="${qid}">🎙 Contarlo con mi voz</button>
+    <button class="mic-btn" data-mic-action="grabar" data-q="${qid}">🎙 Contarlo con mi voz</button>
   </div>`;
 }
 
@@ -523,11 +566,11 @@ function renderResumen(){
     if(!sel.length && !texto) txt += `   (sin respuesta)\n`;
   });
   return `
-    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.75rem;">
-      <p class="small" style="font-style:italic">Guardado en este dispositivo. Aquí tienes tu resumen — cópialo si quieres guardarlo aparte:</p>
+    <div style="margin-top:.5rem;display:flex;flex-direction:column;gap:.75rem;">
+      <p class="small" style="font-style:italic">Aquí tienes tu resumen — cópialo si quieres guardarlo aparte:</p>
       <div class="resumen" id="resumen-txt">${esc(txt)}</div>
       <div class="copybar">
-        <button class="btn" id="btn-copiar" style="padding:.6rem 1.2rem;font-size:.75rem">Copiar resumen</button>
+        <button class="link" id="btn-copiar">Copiar resumen</button>
         <span id="copiado-msg" class="small" style="display:none">Copiado ✓</span>
       </div>
       <span id="envio-badge" class="small" style="color:var(--soft)">${D._envioEstado==="ok"?"Guardado también en el servidor ✓":""}</span>
@@ -541,21 +584,29 @@ async function enviarRespuestasAlServidor(){
   if(!GAS_ENDPOINT || D._envioEstado==="ok" || D._envioEstado==="enviando") return;
   D._envioEstado = "enviando";
   try{
+    // Camino 2: cualquier audio que se haya quedado sin transcribir se
+    // intenta subir a Drive justo antes de armar el resumen final. Si falla
+    // (p.ej. Drive aún no autorizado), no truena nada — sigue igual que hoy.
+    await Promise.all(PREGUNTAS.map(q=>subirAudioSiHaceFalta(q.id)));
+
     const r = D._resultado || calcularPerfil(D.respuestas);
     const respuestas = PREGUNTAS.map(q=>{
       const seleccionadas = D.respuestas[q.id]||[];
       const labels = seleccionadas.map(id=>{
         const op=(q.opciones||[]).find(o=>o.id===id); return op?op.label:id;
       });
+      const grab = grabaciones[q.id];
       return {
         pregunta: q.pregunta,
         opciones: labels,
         texto: (D.textos[q.id]||"").trim(),
-        audio: !!(grabaciones[q.id] && grabaciones[q.id].estado==="listo"),
+        audioLink: grab && grab.driveUrl ? grab.driveUrl : undefined,
+        audio: !!(grab && grab.estado==="listo-audio" && !grab.driveUrl),
       };
     });
     const payload = {
       nombre: D.nombre, correo: D.correo,
+      marketing: !!D.marketing,
       perfil: r.perfil ? PERFILES[r.perfil].titulo : BAJA_CERTEZA.titulo,
       matiz: r.matiz ? PERFILES[r.matiz].titulo : "",
       respuestas,
@@ -584,25 +635,37 @@ function renderMicEstado(qid){
   const wrap = document.querySelector(`[data-mic="${qid}"]`);
   if(!wrap) return;
   const st = micState(qid);
-  if(st.estado==="permiso"){
-    wrap.outerHTML = `<div class="mic-note" data-mic="${qid}">
-      <p style="margin-bottom:.6rem">Al grabar, guardamos tu voz solo como contexto para la investigación de tu nombre. Nunca se procesa con IA ni se comparte.</p>
-      <button class="mic-btn" data-mic-action="grabar" data-q="${qid}">Entendido, grabar</button>
-    </div>`;
-  } else if(st.estado==="grabando"){
+  // El aviso de voz que aparecía antes de grabar (estado "permiso") se eliminó
+  // por completo (Carril 5, decisión de Bethzy 2026-08-31, Opción A): su
+  // contenido ya vive una sola vez en CONSENTIMIENTO, en el registro. El botón
+  // de micrófono ahora graba directo — el permiso nativo del navegador/SO es
+  // su propio candado.
+  // VOZ+CLARIDAD: sello simulado por el agente que construyó este cambio
+  // (Carril 3, 2026-08-31) — falta el paso real del Guardián de la Voz y el
+  // revisor de claridad (regla 22 de CLAUDE.md); queda pendiente antes de
+  // considerarlo definitivo.
+  if(st.estado==="grabando"){
     wrap.outerHTML = `<div class="mic-wrap" data-mic="${qid}">
       <button class="mic-btn rec" data-mic-action="detener" data-q="${qid}">● Grabando… toca para detener</button>
     </div>`;
-  } else if(st.estado==="listo"){
-    wrap.outerHTML = `<div class="mic-wrap" data-mic="${qid}">
+  } else if(st.estado==="transcribiendo"){
+    wrap.outerHTML = `<div class="mic-note" data-mic="${qid}">Un momento…</div>`;
+  } else if(st.estado==="listo-texto"){
+    wrap.outerHTML = `<div class="mic-listo" data-mic="${qid}">
+      <p class="mic-listo-msg">✓ Convertido a texto arriba — puedes leerlo y corregirlo</p>
+      <button class="mic-btn-borrar" data-mic-action="borrar" data-q="${qid}">🗑 Borrar y regrabar</button>
+    </div>`;
+  } else if(st.estado==="listo-audio"){
+    wrap.outerHTML = `<div class="mic-listo" data-mic="${qid}">
+      <p class="mic-listo-msg">✓ Grabado — puedes escucharlo aquí</p>
       <audio controls src="${st.audioUrl}"></audio>
-      <button class="link" data-mic-action="borrar" data-q="${qid}">borrar</button>
+      <button class="mic-btn-borrar" data-mic-action="borrar" data-q="${qid}">🗑 Borrar y regrabar</button>
     </div>`;
   } else if(st.estado==="error"){
     wrap.outerHTML = `<div class="mic-note" data-mic="${qid}">No pudimos acceder al micrófono. Puedes escribirlo en su lugar.</div>`;
   } else {
     wrap.outerHTML = `<div class="mic-wrap" data-mic="${qid}">
-      <button class="mic-btn" data-mic-action="pedir" data-q="${qid}">🎙 Contarlo con mi voz</button>
+      <button class="mic-btn" data-mic-action="grabar" data-q="${qid}">🎙 Contarlo con mi voz</button>
     </div>`;
   }
   wireMic();
@@ -614,17 +677,46 @@ async function empezarGrabacion(qid){
     const stream = await navigator.mediaDevices.getUserMedia({audio:true});
     const mr = new MediaRecorder(stream);
     st.chunks = [];
+    st.audioBlob = null;
+    st.transcripcion = "";
+    st.transcripcionOk = false;
+    st._pendientes = TRANSCRIPCION_DISPONIBLE ? 2 : 1; // MediaRecorder + (si hay) SpeechRecognition
     mr.ondataavailable = e=>st.chunks.push(e.data);
     mr.onstop = ()=>{
       const tipo = mr.mimeType || "audio/webm";
-      const blob = new Blob(st.chunks,{type:tipo});
-      st.audioUrl = URL.createObjectURL(blob);
-      st.estado = "listo";
+      st.audioBlob = new Blob(st.chunks,{type:tipo});
+      st.audioUrl = URL.createObjectURL(st.audioBlob);
       stream.getTracks().forEach(t=>t.stop());
-      renderMicEstado(qid);
+      st._pendientes--;
+      if(st._pendientes<=0) finalizarGrabacion(qid);
     };
     st.mediaRecorder = mr;
     mr.start();
+
+    // Camino 1: en paralelo, intentamos oír lo mismo con reconocimiento de
+    // voz nativo del teléfono. Si esto falla, no rompe la grabación —
+    // simplemente no habrá transcripción y se cae al camino 2.
+    if(TRANSCRIPCION_DISPONIBLE){
+      try{
+        const rec = new SR_CTOR();
+        rec.lang = "es-MX";
+        rec.continuous = false;
+        rec.interimResults = false;
+        rec.maxAlternatives = 1;
+        rec.onresult = (ev)=>{
+          const texto = ev.results && ev.results[0] && ev.results[0][0] ? ev.results[0][0].transcript : "";
+          if(texto && texto.trim()){ st.transcripcion = texto.trim(); st.transcripcionOk = true; }
+        };
+        rec.onerror = ()=>{ st.transcripcionOk = false; };
+        rec.onend = ()=>{ st._pendientes--; if(st._pendientes<=0) finalizarGrabacion(qid); };
+        st.recognition = rec;
+        rec.start();
+      }catch(e){
+        // No se pudo ni arrancar el reconocimiento: seguimos solo con audio.
+        st._pendientes--;
+      }
+    }
+
     st.estado = "grabando";
     renderMicEstado(qid);
   }catch(e){
@@ -633,17 +725,82 @@ async function empezarGrabacion(qid){
   }
 }
 
+function finalizarGrabacion(qid){
+  const st = micState(qid);
+  if(st.transcripcionOk && st.transcripcion){
+    // Éxito gratis: el texto vive en la respuesta, el audio nunca sale del
+    // teléfono — se descarta.
+    st.estado = "listo-texto";
+    D.textos[qid] = st.transcripcion;
+    const ta = document.getElementById("ta-"+qid);
+    if(ta) ta.value = st.transcripcion;
+    st.audioBlob = null;
+    st.audioUrl = null;
+  } else {
+    // Camino 2: sin transcripción, el audio real queda listo para subirse
+    // a Drive en el envío final (enviarRespuestasAlServidor).
+    st.estado = "listo-audio";
+  }
+  renderMicEstado(qid);
+}
+
 function wireMic(){
   document.querySelectorAll("[data-mic-action]").forEach(btn=>{
     btn.onclick = ()=>{
       const qid = btn.dataset.q, action = btn.dataset.micAction;
       const st = micState(qid);
-      if(action==="pedir"){ st.estado="permiso"; renderMicEstado(qid); }
-      else if(action==="grabar"){ empezarGrabacion(qid); }
-      else if(action==="detener"){ st.mediaRecorder?.stop(); }
-      else if(action==="borrar"){ st.estado="inicial"; st.audioUrl=null; renderMicEstado(qid); }
+      if(action==="grabar"){ empezarGrabacion(qid); }
+      else if(action==="detener"){
+        st.estado = "transcribiendo";
+        st.mediaRecorder?.stop();
+        try{ st.recognition?.stop(); }catch(e){ /* ya estaba detenido */ }
+      }
+      else if(action==="borrar"){
+        st.estado="inicial"; st.audioUrl=null; st.audioBlob=null;
+        st.transcripcion=""; st.transcripcionOk=false; st.driveUrl=null;
+        renderMicEstado(qid);
+      }
     };
   });
+}
+
+// Convierte un Blob a base64 puro (sin el prefijo data:...;base64,) para
+// mandarlo al backend en JSON.
+function blobABase64(blob){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onloadend = ()=>{
+      const resultado = reader.result || "";
+      const coma = resultado.indexOf(",");
+      resolve(coma>=0 ? resultado.slice(coma+1) : resultado);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Camino 2: sube un audio pendiente a Drive vía el backend. Silencioso si
+// falla (p.ej. Drive aún no autorizado en Apps Script) — el audio ya vive
+// en el localStorage del dispositivo de todos modos.
+async function subirAudioSiHaceFalta(qid){
+  const st = micState(qid);
+  if(st.estado!=="listo-audio" || !st.audioBlob || st.driveUrl) return;
+  try{
+    const audioBase64 = await blobABase64(st.audioBlob);
+    const res = await fetch(GAS_ENDPOINT, {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify({
+        accion:"guardarAudio",
+        nombre: D.nombre,
+        preguntaId: qid,
+        mimeType: st.audioBlob.type || "audio/webm",
+        audioBase64,
+      }),
+    });
+    const data = await res.json();
+    if(data && data.ok && data.driveUrl) st.driveUrl = data.driveUrl;
+  }catch(e){ /* fallo silencioso: se manda el flag viejo en su lugar */ }
 }
 
 // ---------- Eventos por paso ----------
@@ -664,6 +821,7 @@ function wireStep(preguntaActual){
   const inNombre = document.getElementById("in-nombre");
   const inCorreo = document.getElementById("in-correo");
   const inConsiente = document.getElementById("in-consiente");
+  const inMarketing = document.getElementById("in-marketing");
   const btnRegistro = document.getElementById("btn-registro");
   function actualizaBtnRegistro(){
     if(!btnRegistro) return;
@@ -672,6 +830,7 @@ function wireStep(preguntaActual){
   if(inNombre){ inNombre.oninput=()=>{ D.nombre=inNombre.value; actualizaBtnRegistro(); }; }
   if(inCorreo){ inCorreo.oninput=()=>{ D.correo=inCorreo.value; actualizaBtnRegistro(); }; }
   if(inConsiente){ inConsiente.onchange=()=>{ D.consiente=inConsiente.checked; actualizaBtnRegistro(); }; }
+  if(inMarketing){ inMarketing.onchange=()=>{ D.marketing=inMarketing.checked; }; }
   if(btnRegistro){
     btnRegistro.onclick = ()=>{
       const errBox = document.getElementById("registro-error");
