@@ -210,12 +210,12 @@ const ENTRADA = {
   boton:"Quiero ser de los primeros en vivirlo",
 };
 const REGISTRO = {
-  intro:"Estás a punto de registrar tu nombre en La geometría de tu nombre, la primera experiencia de Realm-e.",
+  intro:"Para llegar a los orígenes ocultos de tu nombre, necesitamos el único dato que no está en los registros históricos: cómo has vivido tu nombre.",
   labelNombre:"¿Cómo te llamas?",
   avisoCorreo:"Cuando tu acceso a la primera edición esté listo, te avisaremos por correo.",
   labelCorreo:"¿A qué correo te avisamos?",
   boton:"Guardar mi lugar y continuar",
-  confirmacion:"Para llegar a los orígenes ocultos de tu nombre, necesitamos el único dato que no está en los registros históricos: cómo has vivido tu nombre. Lo que compartas aquí será la brújula de nuestra investigación.",
+  confirmacion:"Gracias — lo que acabas de compartir será la brújula de nuestra investigación.",
 };
 
 // Momento único de consentimiento (Carril 5, decisión de Bethzy 2026-08-31: Opción A).
@@ -388,7 +388,7 @@ function render(){
   else if(step===STEP_REGISTRO){
     html += `
       <div style="display:flex;flex-direction:column;gap:1.25rem;padding:2rem 0;">
-        <p>${esc(REGISTRO.intro)}</p>
+        <p class="frase">${esc(REGISTRO.intro)}</p>
         <label class="field">${esc(REGISTRO.labelNombre)}
           <input type="text" id="in-nombre" placeholder="Tu nombre completo" value="${esc(D.nombre)}">
         </label>
