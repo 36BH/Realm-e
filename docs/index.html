@@ -208,7 +208,7 @@ const ENTRADA = {
   boton:"Quiero saber",
 };
 const REGISTRO = {
-  intro:"Vamos a empezar con un primer grupo de nombres. Si el tuyo está en la lista, te avisamos por correo cuando llegue su turno.",
+  intro:"Vamos a empezar con un primer grupo de nombres. Te avisamos por correo cuando llegue tu turno.",
   labelNombre:"¿Cómo te llamas?",
   ayudaNombre:"Escribe tu nombre completo, tal como aparece en tus documentos.",
   labelCorreo:"¿A qué correo te avisamos?",
@@ -216,24 +216,16 @@ const REGISTRO = {
   confirmacion:"Tu lugar está guardado.\n\nAhora conversemos.\n\nSoy tu nombre. El que has escuchado toda tu vida.\n\nTal vez te gusto, tal vez no del todo. Quizá sientes que simplemente te tocó llevarme.\n\nAntes de investigar la historia que comenzó antes de ti, quiero conocer la nuestra: cómo me has vivido tú.",
 };
 
-// Momento único de consentimiento (Carril 5, decisión de Bethzy 2026-08-31: Opción A).
-// Sustituye TODO el goteo anterior (pie de registro + checkbox viejo + aviso de voz
-// repetido por pregunta + nota del resumen): un solo momento, aquí, en el registro.
-// El correo de privacidad ya es real: priv@realm-e.com (activado 2026-09-02, reenvía a Bethzy).
-// La política completa (texto[]) va oculta detrás del enlace "política de privacidad" en el
-// checkbox, no siempre visible (Bethzy, 2026-09-02).
-// VOZ+CLARIDAD: sello simulado por el agente que construyó este cambio (Carril 3,
-// 2026-08-31) — falta el paso real del Guardián de la Voz y el revisor de claridad
-// (regla 22 de CLAUDE.md); queda pendiente antes de considerarlo definitivo.
+// Momento único de consentimiento — un solo lugar, en el registro. Texto general
+// a propósito (Bethzy, 2026-09-10): sin enumerar dato por dato, y sin mencionar
+// ningún correo ni invitar a pedir acceso/corrección/borrado — decisión suya,
+// informada por Legal (el derecho existe igual por ley, ella eligió no
+// anunciarlo en pantalla).
 const CONSENTIMIENTO = {
   texto:[
     "Antes de empezar, esto es lo que hacemos con lo que compartas.",
-    "Guardamos tu nombre, tu correo y tus respuestas.",
-    "Los usamos solo para construir tu Tomo.",
-    "Si grabas tu voz, primero intentamos convertirla en texto en tu propio teléfono.",
-    "Si eso no funciona, guardamos el audio para que la investigación de tu nombre pueda usarlo.",
+    "Tus datos los usamos solo para construir tu Tomo.",
     "Nada se vende. Nada se comparte. Nada se usa para otra cosa.",
-    "Puedes pedir que borremos todo cuando quieras, escribiendo a priv@realm-e.com.",
   ],
   checkConsiente:"He leído cómo cuidamos lo que comparto", // "cómo cuidamos lo que comparto" es el enlace que expande texto[]
 };
