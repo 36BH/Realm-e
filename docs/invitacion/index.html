@@ -155,9 +155,8 @@ const PREGUNTAS = [
   },
   {
     id:"q6",
-    antes:"__DESPUES_Q5__\n\nNo soy solo la forma en que me escriben. También soy el sonido que hace que gires la cabeza cuando alguien te llama. Y no todas las personas me pronuncian como tú me reconoces.",
-    fraseClave:"No siempre rechazamos nuestro nombre. A veces rechazamos lo que aprendimos a sentir cuando lo escuchábamos.",
-    pregunta:"¿Cómo debo sonar cuando alguien dice tu nombre?", multi:true, permiteTexto:true, permiteVoz:true,
+    antes:"__DESPUES_Q5__\n\nNo soy solo la forma en que me escriben. También soy la forma en que me escuchas.",
+    pregunta:"¿Cómo sueno cuando alguien me pronuncia?", multi:true, permiteTexto:true, permiteVoz:true,
     textoEsPrincipal:true, placeholderTexto:"Dilo tú, como debe sonar (o escríbelo)",
     opciones:[
       {id:"igualEscrito",label:"Suena igual que como se escribe"},{id:"cambiaSegunQuien",label:"Cambia según quién lo diga"},
@@ -166,8 +165,8 @@ const PREGUNTAS = [
   },
   {
     id:"q7",
-    antes:"Esa es mi forma más cercana a ti. La que reconoces sin verla escrita. La que lleva tu historia, tu acento y la manera en que aprendiste a responderme.",
-    pregunta:"¿Alguna vez han cambiado, acortado o pronunciado mal tu nombre? ¿Qué hiciste tú con eso?", multi:true, permiteTexto:true, permiteVoz:true,
+    antes:"Esa es mi forma más cercana a ti.",
+    pregunta:"Cuando me cambian, me acortan o me pronuncian mal, ¿qué haces?", multi:true, permiteTexto:true, permiteVoz:true,
     opciones:[
       {id:"corrijoSiempre",label:"Lo corrijo siempre"},{id:"corrijoAVeces",label:"Lo corrijo solo a veces, según quién"},
       {id:"dejoPasar",label:"Lo dejo pasar"},{id:"adapteVersion",label:"Me adapté: uso otra versión según el lugar"},
@@ -176,8 +175,7 @@ const PREGUNTAS = [
   },
   {
     id:"q8",
-    antes:"__DESPUES_Q7__\n\nHe cambiado contigo. No soy exactamente el mismo nombre que recibiste al nacer. Ahora llevo lo que viviste, lo que elegiste conservar y también lo que decidiste transformar.",
-    fraseClave:"La manera en que permites que digan tu nombre también revela cómo ocupas tu lugar.",
+    antes:"Nuestra relación también ha cambiado con los años.",
     pregunta:"¿Qué lugar ocupo hoy en tu vida?", multi:true, permiteTexto:true, permiteVoz:true,
     opciones:[
       {id:"identidad",label:"Eres parte de mi identidad — me representas"},{id:"masCarino",label:"Te quiero más que antes"},
@@ -187,9 +185,9 @@ const PREGUNTAS = [
   },
   {
     id:"q9",
-    antes:"Eso es lo que soy hoy para ti. No solo una palabra en un documento. Soy la forma en que te presentas, la manera en que otros te reconocen y una parte de la historia que has construido contigo.",
-    pregunta:"¿Qué descubriste sobre ti al hablar de mí de esta manera?", multi:false, permiteTexto:true, permiteVoz:true,
-    notaSuave:"No hay respuesta corta que valga más que la tuya.",
+    antes:"Eso es lo que soy hoy para ti. No solo una palabra en un documento.",
+    pregunta:"¿Qué descubriste sobre ti al hablar conmigo de esta manera?", multi:false, permiteTexto:true, permiteVoz:true,
+    notaSuave:"Puedes contarme con palabras o con tu voz. No necesitas encontrar las perfectas.",
   },
 ];
 
@@ -205,17 +203,17 @@ const DESPUES_Q5 = "Quizá no querías dejarme atrás. Quizá solo necesitabas e
 const DESPUES_Q7 = "Cada vez que me corregiste, me adaptaste o decidiste dejarme sonar distinto, también estabas tomando una decisión sobre ti.";
 
 const ENTRADA = {
-  titulo:"No conoces tu nombre tanto como crees.",
-  cuerpo:"Descubre cómo llegó hasta ti, cómo lo transformaste al hacerlo tuyo y qué parte de su historia todavía desconoces.",
-  boton:"Quiero ser de los primeros en vivirlo",
+  titulo:"Conoces tu nombre… pero probablemente no conoces su verdadera historia.",
+  cuerpo:"Hay algo detrás de él que quizá nunca te contaron.",
+  boton:"Quiero saber",
 };
 const REGISTRO = {
-  intro:"Para llegar a los orígenes ocultos de tu nombre, necesitamos el único dato que no está en los registros históricos: cómo has vivido tu nombre.",
+  intro:"Vamos a empezar con un primer grupo de nombres. Si el tuyo está en la lista, te avisamos por correo cuando llegue su turno.",
   labelNombre:"¿Cómo te llamas?",
-  avisoCorreo:"Cuando tu acceso a la primera edición esté listo, te avisaremos por correo.",
+  ayudaNombre:"Escribe tu nombre completo, tal como aparece en tus documentos.",
   labelCorreo:"¿A qué correo te avisamos?",
   boton:"Guardar mi lugar y continuar",
-  confirmacion:"Gracias — lo que acabas de compartir será la brújula de nuestra investigación.",
+  confirmacion:"Tu lugar está guardado.\n\nAhora conversemos.\n\nSoy tu nombre. El que has escuchado toda tu vida.\n\nTal vez te gusto, tal vez no del todo. Quizá sientes que simplemente te tocó llevarme.\n\nAntes de investigar la historia que comenzó antes de ti, quiero conocer la nuestra: cómo me has vivido tú.",
 };
 
 // Momento único de consentimiento (Carril 5, decisión de Bethzy 2026-08-31: Opción A).
@@ -237,30 +235,30 @@ const CONSENTIMIENTO = {
     "Nada se vende. Nada se comparte. Nada se usa para otra cosa.",
     "Puedes pedir que borremos todo cuando quieras, escribiendo a priv@realm-e.com.",
   ],
-  checkConsiente:"He leído la política de privacidad", // dividido en el template: "política de privacidad" es el enlace que expande texto[]
-  checkMarketing:"Avísame también de otras novedades de Realm-e por correo.",
+  checkConsiente:"He leído cómo cuidamos lo que comparto", // "cómo cuidamos lo que comparto" es el enlace que expande texto[]
 };
 const ANTES_PERFIL = {
-  antes:"Ahora ya conoces la parte de mi historia que solo tú podías contar. Sabes cómo llegué a ti, cómo me llamas, cómo me hiciste tuyo, cómo debo sonar y qué lugar ocupo en tu vida.",
-  fraseClave:"Antes de investigar de dónde vengo, necesitábamos descubrir quién llegué a ser contigo.",
-  gancho:"Tu parte ya está registrada. Ahora Realm-e podrá comenzar, cuando llegue tu turno, a buscar la parte de mi historia que ocurrió antes de ti.",
-  manifiestoIntro:"No soy solo una palabra. Existo en la tinta de tus documentos, pero cobré vida en tus decisiones, en tu voz y en tus relaciones. Por lo que acabas de contarme, esta es la forma en que hoy parecemos vivir juntos:",
-  cierre:"Esta es la parte de mí que tú sí conoces. Pero todavía existe una parte que ninguno de los dos puede recordar.",
+  antes:"Ya conozco la parte de mi historia que solo tú podías contar: cómo llegué a tu vida, las formas en que me llaman, cómo sueno para ti y el lugar que ocupo hoy.",
+  fraseClave:"Antes de investigar la historia que comenzó antes de ti, necesitaba conocer la nuestra.",
+  gancho:"Esto es lo que tus respuestas reflejan hoy:",
+  manifiestoIntro:"Y esto fue lo que tú descubriste:",
+  cierre:"Esta es la parte de mí que tú sí conoces. Todavía queda por investigar la historia que comenzó antes de ti.",
 };
+const ORIGEN_CREADO = {titulo:"Fui creado para ti",texto:"Según la historia que conoces, me inventaron, combinaron o modificaron especialmente para ti. Puede que existan antecedentes que todavía no conozcas, pero dentro de tu historia familiar mi forma apareció contigo."};
 const PERFILES = {
-  esculpido:{titulo:"Fui esculpido",texto:"No te quedaste únicamente con la versión que apareció en tus documentos. Tú o las personas que te quieren fueron ajustándome hasta encontrar una forma más cercana, práctica o íntima de llamarte. No permitiste que el papel tuviera la última palabra. No me rechazaste: me transformaste hasta reconocerme como tuyo."},
-  conquistado:{titulo:"Fui conquistado",texto:"No fui un regalo fácil de recibir. Tuviste que aprender a defenderme, corregirme o seguir haciendo las paces conmigo. En ese proceso descubriste que ocupar tu lugar también significa no reducirte para facilitarles las cosas a otros. Hoy, pedir que me digan correctamente es una forma de hacerte presente."},
-  "raiz-viva":{titulo:"Soy tu raíz viva",texto:"Me llevas contigo porque reconoces el peso de la historia que me entregó a ti. Eres la continuidad de una decisión tomada antes de que nacieras. Para ti no soy un límite, sino un ancla. Te recuerdo que no comenzaste desde cero: perteneces a una historia que vuelve a hacerse presente cada vez que alguien me pronuncia."},
-  frontera:{titulo:"Soy tu frontera",texto:"Aprendiste a dejarme vivir de maneras diferentes según el lugar y las personas. A los desconocidos les entregas mi versión oficial o práctica. Pero reservas mi forma más íntima —con su propio sonido, acento o historia— para quienes conocen una parte más cercana de ti. No todas mis versiones abren la misma puerta."},
-  ligereza:{titulo:"Vivo contigo con ligereza",texto:"Sabes que eres mucho más grande que las letras que me forman. No necesitas que yo esconda un significado extraordinario para reconocer tu valor. Tu identidad también se construye en lo que eliges y haces. Yo te acompaño, pero no necesito explicarte por completo."},
-  creado:{titulo:"Fui creado para ti",texto:"Según la historia que conoces, fui creado, combinado o modificado especialmente para ti. No llegué a tu vida exactamente como otros nombres: alguien intervino en mi forma antes de entregártela. Tal vez mi historia tenga antecedentes que todavía desconocemos, pero en tu familia tú representas un nuevo comienzo."},
+  esculpido:{titulo:"Me hiciste tuyo",texto:"No te limitaste a la forma en que aparezco en tus documentos. Con el tiempo encontraste maneras de hacerme más cercano a ti: quizá me acortaste, me cambiaste o permitiste que quienes te quieren me dieran otra forma. No significa que me hayas rechazado. Parece que fuiste encontrando la manera de reconocerme como tuyo."},
+  conquistado:{titulo:"Aprendiste a defenderme",texto:"Vivir conmigo no siempre ha sido sencillo. En distintos momentos quizá tuviste que corregirme, explicarme o decidir cuándo valía la pena defenderme. También puede ser que todavía estemos haciendo las paces. Lo que contaste muestra que la manera en que otros me dicen puede tocar algo importante para ti."},
+  "raiz-viva":{titulo:"Te conecto con tus raíces",texto:"Cuando me escuchas, también puede aparecer la historia de las personas y los lugares de donde vienes. Parece que en mí reconoces un vínculo con tu familia o tu origen. No cuento toda tu historia, pero sí conservo una parte que sigue presente cada vez que alguien me pronuncia."},
+  frontera:{titulo:"Tengo distintas formas contigo",texto:"No vivo de una sola manera contigo. Mi forma puede cambiar según quién te llame, dónde estés o qué idioma estés hablando. Algunas versiones de mí son prácticas; otras se sienten más cercanas. Parece que aprendiste a reconocer cuáles formas compartes con cada parte de tu vida."},
+  ligereza:{titulo:"Vivo contigo sin complicaciones",texto:"Parece que no necesitas pensar demasiado en mí para saber quién eres. Me usas, respondes cuando me escuchas y sigues con tu vida. Eso no significa que yo importe poco. Simplemente, hasta hoy, he vivido contigo sin pedir demasiada atención."},
 };
-const BAJA_CERTEZA = {titulo:"Tu relación todavía está tomando forma",texto:"Hay partes de tu relación con tu nombre que aparecieron hoy por primera vez. Todavía no existe una señal suficientemente clara para reducirla a una sola forma."};
+const BAJA_CERTEZA = {titulo:"Lo nuestro tiene varios matices",texto:"Tus respuestas no apuntan a una sola forma de vivir conmigo. En algunas aparece cercanía; en otras, costumbre, adaptación o preguntas que quizá no te habías hecho antes. No necesito reducir lo nuestro a una sola categoría para devolverte algo verdadero: nuestra relación tiene más de una forma."};
 const CIERRE = {
   cuerpo:[
     "Tu presente está claro. Mi pasado todavía no. Hoy reconoces lo que hemos construido juntos.",
     "Pero mi historia no comenzó el día en que llegué a ti. Antes tuve otras formas, otros sonidos, otros lugares.",
-    "Realm-e va a buscar esa historia para ti. Te contará solo lo que se pueda comprobar — y te dirá con honestidad cuando algo no se pueda. Las primeras investigaciones de La geometría de tu nombre están por comenzar. Tu lugar en la primera edición ya está guardado.",
+    "Voy a ir a buscar esa historia. Tú ya hiciste tu parte.",
+    "Mientras tanto, esto es lo que pasa con tu lugar: las investigaciones de La geometría de tu nombre están por comenzar. Tu lugar en la primera edición ya está guardado.",
   ],
   fraseFinal:"Tú ya me contaste cómo llegué a ser parte de tu vida. Ahora falta descubrir quién era antes de encontrarte.",
 };
@@ -287,7 +285,7 @@ const MAPA_ESTATICO = [
 function tiene(respuestas,p,...ops){const e=respuestas[p]||[];return ops.some(o=>e.includes(o));}
 
 function calcularPerfil(respuestas){
-  if(tiene(respuestas,"q2","creado")) return {perfil:"creado",matiz:null};
+  const origenCreado = tiene(respuestas,"q2","creado");
   const senales=[];
   for(const m of MAPA_ESTATICO){ if(tiene(respuestas,m.p,m.o)) senales.push({perfil:m.perfil,peso:m.peso,p:m.p}); }
   if(tiene(respuestas,"q7","corrijoSiempre")){
@@ -303,14 +301,14 @@ function calcularPerfil(respuestas){
     preguntasPorPerfil.get(s.perfil).add(s.p);
   }
   const ordenados=[...totales.entries()].sort((a,b)=>b[1]-a[1]);
-  if(!ordenados.length) return {perfil:null,matiz:null};
+  if(!ordenados.length) return {perfil:null,matiz:null,origenCreado};
   const [ganador,puntos]=ordenados[0], segundo=ordenados[1];
   const conteoGanador=senales.filter(s=>s.perfil===ganador).length;
   const preguntasDistintas=preguntasPorPerfil.get(ganador)?.size||0;
   const diferencia=puntos-(segundo?.[1]||0);
-  if(!(conteoGanador>=3 && preguntasDistintas>=2 && diferencia>=1)) return {perfil:null,matiz:null};
+  if(!(conteoGanador>=3 && preguntasDistintas>=2 && diferencia>=1)) return {perfil:null,matiz:null,origenCreado};
   const matiz = segundo && puntos===segundo[1] ? segundo[0] : null;
-  return {perfil:ganador,matiz};
+  return {perfil:ganador,matiz,origenCreado};
 }
 
 // ---------- Estado + localStorage (clave realme_inv_v3, heredada del artifact previo) ----------
@@ -347,7 +345,7 @@ const TRANSCRIPCION_DISPONIBLE = !!SR_CTOR;
 
 // ---------- Pasos ----------
 
-const STEP_ENTRADA=0, STEP_REGISTRO=1, STEP_CONFIRMACION=2, STEP_UMBRAL=3, STEP_PREGUNTAS_INICIO=4;
+const STEP_ENTRADA=0, STEP_REGISTRO=1, STEP_UMBRAL=2, STEP_PREGUNTAS_INICIO=3;
 const STEP_PERFIL = STEP_PREGUNTAS_INICIO + PREGUNTAS.length;
 const STEP_CIERRE = STEP_PERFIL + 1;
 
@@ -392,41 +390,28 @@ function render(){
         <label class="field">${esc(REGISTRO.labelNombre)}
           <input type="text" id="in-nombre" placeholder="Tu nombre completo" value="${esc(D.nombre)}">
         </label>
-        <p class="small">${esc(REGISTRO.avisoCorreo)}</p>
+        <p class="small">${esc(REGISTRO.ayudaNombre)}</p>
         <label class="field">${esc(REGISTRO.labelCorreo)}
           <input type="email" id="in-correo" placeholder="tu@correo.com" value="${esc(D.correo)}">
         </label>
         <div class="consentimiento" style="display:flex;flex-direction:column;gap:.5rem">
           <label class="checkbox-row">
             <input type="checkbox" id="in-consiente" ${D.consiente?"checked":""}>
-            <span>He leído la <button type="button" id="btn-toggle-politica" class="link-inline">política de privacidad</button></span>
+            <span>He leído <button type="button" id="btn-toggle-politica" class="link-inline">cómo cuidamos lo que comparto</button></span>
           </label>
           <div id="politica-texto" class="politica-texto" style="display:none;flex-direction:column;gap:.35rem;padding-left:1.9rem">
             ${CONSENTIMIENTO.texto.map(l=>`<p class="small" style="font-style:italic">${esc(l)}</p>`).join("")}
           </div>
         </div>
-        <label class="checkbox-row">
-          <input type="checkbox" id="in-marketing" ${D.marketing?"checked":""}>
-          ${esc(CONSENTIMIENTO.checkMarketing)}
-        </label>
         <div id="registro-error" class="err"></div>
         <button class="btn" id="btn-registro" style="align-self:flex-start" ${(!D.nombre?.trim()||!D.correo?.trim()||!D.consiente)?"disabled":""}>${esc(REGISTRO.boton)}</button>
-      </div>`;
-  }
-  else if(step===STEP_CONFIRMACION){
-    html += `
-      <div style="display:flex;flex-direction:column;gap:1.5rem;padding:2.5rem 0;">
-        <p>${esc(REGISTRO.confirmacion)}</p>
-        <button class="btn center-self" id="btn-continuar-confirm">Continuar</button>
       </div>`;
   }
   else if(step===STEP_UMBRAL){
     html += `
       <div class="center" style="padding:2.5rem 0;display:flex;flex-direction:column;gap:1.5rem;">
-        <h1 class="big">${esc(D.nombre||"Tu nombre")}</h1>
-        <p class="maxw">Soy tu nombre. El que has escuchado toda tu vida.</p>
-        <p class="maxw">Hoy vamos a tener una plática — hay cosas que solo tú sabes de mí, y quiero preguntártelas.</p>
-        <button class="btn center-self" id="btn-empecemos">Empecemos</button>
+        ${REGISTRO.confirmacion.split("\n\n").map(p=>`<p class="maxw">${esc(p)}</p>`).join("")}
+        <button class="btn center-self" id="btn-empecemos">Comenzar</button>
       </div>`;
   }
   else if(preguntaActual){
@@ -438,9 +423,11 @@ function render(){
       <div style="display:flex;flex-direction:column;gap:1.5rem;padding:2rem 0;">
         <p>${esc(ANTES_PERFIL.antes)}</p>
         <p class="frase">${esc(ANTES_PERFIL.fraseClave)}</p>
-        <p>${esc(ANTES_PERFIL.gancho)}</p>
         <hr>
-        <p>${esc(ANTES_PERFIL.manifiestoIntro)}</p>`;
+        <p>${esc(ANTES_PERFIL.gancho)}</p>`;
+    if(r.origenCreado){
+      html += `<h2>${esc(ORIGEN_CREADO.titulo)}</h2><p>${esc(ORIGEN_CREADO.texto)}</p>`;
+    }
     if(r.perfil){
       html += `<h2>${esc(PERFILES[r.perfil].titulo)}</h2><p>${esc(PERFILES[r.perfil].texto)}</p>`;
       if(r.matiz){
@@ -448,6 +435,10 @@ function render(){
       }
     } else {
       html += `<h2>${esc(BAJA_CERTEZA.titulo)}</h2><p>${esc(BAJA_CERTEZA.texto)}</p>`;
+    }
+    const respuestaQ9 = (D.textos["q9"]||"").trim();
+    if(respuestaQ9){
+      html += `<p>${esc(ANTES_PERFIL.manifiestoIntro)}</p><p style="font-style:italic">&ldquo;${esc(respuestaQ9)}&rdquo;</p>`;
     }
     html += `
         <p style="font-style:italic">${esc(ANTES_PERFIL.cierre)}</p>
@@ -466,8 +457,17 @@ function render(){
   }
 
   html += `</div>`;
+  if(step!==STEP_ENTRADA){
+    html += `<button type="button" id="btn-reiniciar" class="link" style="align-self:center;margin-top:2rem;opacity:.7">Reiniciar la experiencia</button>`;
+  }
   app.innerHTML = html;
   wireStep(preguntaActual);
+}
+
+function reiniciarExperiencia(){
+  if(!window.confirm("¿Estás segura? Se borrarán tus respuestas.")) return;
+  D = {step:0, nombre:"", correo:"", respuestas:{}, textos:{}, condicionalQ5:"", consiente:false};
+  render();
 }
 
 function renderPregunta(preguntaActual){
@@ -820,13 +820,15 @@ function guardarTextosVisibles(){
 }
 
 function wireStep(preguntaActual){
+  const btnReiniciar = document.getElementById("btn-reiniciar");
+  if(btnReiniciar) btnReiniciar.onclick = reiniciarExperiencia;
+
   const btnEntrada = document.getElementById("btn-entrada");
   if(btnEntrada) btnEntrada.onclick = ()=>{ D.step=STEP_REGISTRO; render(); };
 
   const inNombre = document.getElementById("in-nombre");
   const inCorreo = document.getElementById("in-correo");
   const inConsiente = document.getElementById("in-consiente");
-  const inMarketing = document.getElementById("in-marketing");
   const btnRegistro = document.getElementById("btn-registro");
   function actualizaBtnRegistro(){
     if(!btnRegistro) return;
@@ -835,7 +837,6 @@ function wireStep(preguntaActual){
   if(inNombre){ inNombre.oninput=()=>{ D.nombre=inNombre.value; actualizaBtnRegistro(); }; }
   if(inCorreo){ inCorreo.oninput=()=>{ D.correo=inCorreo.value; actualizaBtnRegistro(); }; }
   if(inConsiente){ inConsiente.onchange=()=>{ D.consiente=inConsiente.checked; actualizaBtnRegistro(); }; }
-  if(inMarketing){ inMarketing.onchange=()=>{ D.marketing=inMarketing.checked; }; }
   const btnPolitica = document.getElementById("btn-toggle-politica");
   const politicaTexto = document.getElementById("politica-texto");
   if(btnPolitica && politicaTexto){ btnPolitica.onclick = ()=>{ politicaTexto.style.display = politicaTexto.style.display==="none" ? "flex" : "none"; }; }
@@ -848,13 +849,10 @@ function wireStep(preguntaActual){
       errBox.textContent = "";
       D.nombre = inNombre.value.trim();
       D.correo = inCorreo.value.trim();
-      D.step = STEP_CONFIRMACION;
+      D.step = STEP_UMBRAL;
       render();
     };
   }
-
-  const btnConfirm = document.getElementById("btn-continuar-confirm");
-  if(btnConfirm) btnConfirm.onclick = ()=>{ D.step=STEP_UMBRAL; render(); };
 
   const btnEmpecemos = document.getElementById("btn-empecemos");
   if(btnEmpecemos) btnEmpecemos.onclick = ()=>{ D.step=STEP_PREGUNTAS_INICIO; render(); };
