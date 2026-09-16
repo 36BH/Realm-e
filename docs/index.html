@@ -102,6 +102,7 @@ const PREGUNTAS = [
     id:"q1",
     antes:"Yo existía mucho antes de que tú nacieras. Pero hubo un momento exacto en que alguien tomó una decisión. Alguien eligió que yo sería la palabra con la que comenzarían a reconocerte.",
     pregunta:"¿Quién me eligió para ti?", multi:true, permiteTexto:true, permiteVoz:true,
+    notaInstruccion:"Marca las opciones que apliquen. También puedes escribir o grabar tu voz para contar más. Entre más completa la información, más completa sale tu experiencia.",
     opciones:[
       {id:"mama",label:"Mi mamá"},{id:"papa",label:"Mi papá"},{id:"ambos",label:"Los dos, juntos"},
       {id:"abuelo",label:"Mi abuela o abuelo"},{id:"otroFamiliar",label:"Una tía, tío u otra persona de la familia"},
@@ -509,6 +510,10 @@ function renderPregunta(preguntaActual){
       html += `<button class="op${sel?" sel":""}" data-op="${esc(op.id)}" data-q="${preguntaActual.id}" data-multi="${preguntaActual.multi}"><span>${esc(op.label)}</span>${sel?'<span class="op-check">✓</span>':''}</button>`;
     }
     html += `</div>`;
+  }
+
+  if(preguntaActual.notaInstruccion){
+    html += `<p class="small">${esc(preguntaActual.notaInstruccion)}</p>`;
   }
 
   if(preguntaActual.campoCondicional){
