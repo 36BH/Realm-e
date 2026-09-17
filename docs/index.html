@@ -307,11 +307,11 @@ function calcularPerfil(respuestas){
 // ---------- Estado + localStorage (clave realme_inv_v3, heredada del artifact previo) ----------
 
 const LS_KEY = "realme_inv_v3";
-// Web App de Apps Script que guarda cada brújula como Issue en 36BH/Realm-e.
-// Se llena con la URL real tras el deploy (clasp deploy). Si está vacía, el
-// envío a servidor simplemente no ocurre — localStorage sigue siendo la
-// fuente de verdad en el dispositivo y nada se rompe.
-const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbydR7Ha93_isPaDFlMvECsuaGL0Hr1VVn-yTt9GHBaZuOi14ASAErnuKaR6namV_QC7sQ/exec";
+// Puerta propia de Realm-e (Worker + base D1 "realm-e", tabla name_respuestas) — reemplaza
+// el envío viejo a un Issue de GitHub vía Apps Script (decisión de Bethzy, 2026-09-17: mismo
+// dato completo, destino propio y controlado, un proveedor menos). Si falla, localStorage
+// sigue siendo la fuente de verdad en el dispositivo y nada se rompe.
+const API_ENDPOINT = "https://realm-e-api.bethzy-hdz-f.workers.dev/name/registro";
 function cargarEstado(){
   try{ const raw=localStorage.getItem(LS_KEY); return raw?JSON.parse(raw):{}; }catch{ return {}; }
 }
@@ -579,46 +579,42 @@ function renderResumen(){
     </div>`;
 }
 
-// ---------- Envío silencioso al backend (Apps Script → Issue en GitHub) ----------
+// ---------- Envío silencioso a la puerta propia (Worker + D1) ----------
 // No reemplaza localStorage: es un guardado adicional. Si falla (sin internet,
-// endpoint vacío, servidor caído) la experiencia de la persona sigue intacta.
+// servidor caído) la experiencia de la persona sigue intacta.
 async function enviarRespuestasAlServidor(){
-  if(!GAS_ENDPOINT || D._envioEstado==="ok" || D._envioEstado==="enviando") return;
+  if(!API_ENDPOINT || D._envioEstado==="ok" || D._envioEstado==="enviando") return;
   D._envioEstado = "enviando";
   try{
-    // Camino 2: cualquier audio que se haya quedado sin transcribir se
-    // intenta subir a Drive justo antes de armar el resumen final. Si falla
-    // (p.ej. Drive aún no autorizado), no truena nada — sigue igual que hoy.
-    await Promise.all(PREGUNTAS.map(q=>subirAudioSiHaceFalta(q.id)));
-
     const r = D._resultado || calcularPerfil(D.respuestas);
-    const respuestas = PREGUNTAS.map(q=>{
+    const respuestas = await Promise.all(PREGUNTAS.map(async (q)=>{
       const seleccionadas = D.respuestas[q.id]||[];
       const labels = seleccionadas.map(id=>{
         const op=(q.opciones||[]).find(o=>o.id===id); return op?op.label:id;
       });
       const grab = grabaciones[q.id];
+      const tieneAudioSinTranscribir = grab && grab.estado==="listo-audio" && grab.audioBlob;
       return {
         pregunta: q.pregunta,
         opciones: labels,
         texto: (D.textos[q.id]||"").trim(),
-        audioLink: grab && grab.driveUrl ? grab.driveUrl : undefined,
-        audio: !!(grab && grab.estado==="listo-audio" && !grab.driveUrl),
+        audioBase64: tieneAudioSinTranscribir ? await blobABase64(grab.audioBlob) : undefined,
+        audioMimeType: tieneAudioSinTranscribir ? (grab.audioBlob.type || "audio/webm") : undefined,
       };
-    });
+    }));
     const payload = {
       nombre: D.nombre, correo: D.correo,
-      marketing: !!D.marketing,
       perfil: r.perfil ? PERFILES[r.perfil].titulo : BAJA_CERTEZA.titulo,
       matiz: r.matiz ? PERFILES[r.matiz].titulo : "",
       respuestas,
     };
-    await fetch(GAS_ENDPOINT, {
+    const res = await fetch(API_ENDPOINT, {
       method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"}, // evita preflight CORS en Apps Script
+      headers:{"Content-Type":"application/json"},
       body: JSON.stringify(payload),
     });
-    D._envioEstado = "ok";
+    const data = await res.json();
+    D._envioEstado = (data && data.ok) ? "ok" : "error";
   }catch(e){
     D._envioEstado = "error"; // fallo silencioso: ya quedó a salvo en localStorage
   }
@@ -779,30 +775,6 @@ function blobABase64(blob){
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
-}
-
-// Camino 2: sube un audio pendiente a Drive vía el backend. Silencioso si
-// falla (p.ej. Drive aún no autorizado en Apps Script) — el audio ya vive
-// en el localStorage del dispositivo de todos modos.
-async function subirAudioSiHaceFalta(qid){
-  const st = micState(qid);
-  if(st.estado!=="listo-audio" || !st.audioBlob || st.driveUrl) return;
-  try{
-    const audioBase64 = await blobABase64(st.audioBlob);
-    const res = await fetch(GAS_ENDPOINT, {
-      method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body: JSON.stringify({
-        accion:"guardarAudio",
-        nombre: D.nombre,
-        preguntaId: qid,
-        mimeType: st.audioBlob.type || "audio/webm",
-        audioBase64,
-      }),
-    });
-    const data = await res.json();
-    if(data && data.ok && data.driveUrl) st.driveUrl = data.driveUrl;
-  }catch(e){ /* fallo silencioso: se manda el flag viejo en su lugar */ }
 }
 
 // ---------- Eventos por paso ----------
