@@ -604,6 +604,7 @@ async function enviarRespuestasAlServidor(){
     }));
     const payload = {
       nombre: D.nombre, correo: D.correo,
+      invitacion_version: "v1",
       perfil: r.perfil ? PERFILES[r.perfil].titulo : BAJA_CERTEZA.titulo,
       matiz: r.matiz ? PERFILES[r.matiz].titulo : "",
       respuestas,
